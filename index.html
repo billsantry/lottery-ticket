@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-  
 <html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -206,10 +204,13 @@ body {
 /* ── STANCE SELECT ── */
 #stance-screen {
   padding: 20px;
-  max-width: 900px;
   width: 100%;
   align-items: center;
   text-align: center;
+}
+
+#stance-screen .stance-grid {
+  max-width: 900px;
 }
 
 .stance-title {
@@ -520,12 +521,19 @@ body {
 /* ── SUMMARY ── */
 #summary-screen {
   padding: 20px;
-  max-width: 700px;
   width: 100%;
   max-height: 100vh;
   overflow-y: auto;
   align-items: center;
   text-align: center;
+}
+
+#summary-screen .sum-grid,
+#summary-screen .sum-blurb,
+#summary-screen .sum-chart,
+#summary-screen .sum-achv {
+  max-width: 700px;
+  width: 100%;
 }
 .sum-title {
   font-size: 12px; color: var(--accent);
@@ -573,12 +581,13 @@ body {
 
 /* ── GLOSSARY ── */
 #glossary-screen {
-  padding: 24px; max-width: 700px; width: 100%;
+  padding: 24px;
+  width: 100%;
   max-height: 100vh; overflow-y: auto;
   font-size: 7px; line-height: 2.2;
   text-align: center;
 }
-#glossary-screen > div { text-align: left; }
+#glossary-screen > div { text-align: left; max-width: 700px; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 800px) {
@@ -592,12 +601,12 @@ body {
 <body>
 
 <div id="crt"></div>
-<canvas id="particles" width="1465" height="429"></canvas>
+<canvas id="particles" width="1516" height="429"></canvas>
 <div id="combo-banner"></div>
 
-<div id="game-root" class="">
+<div id="game-root">
   <!-- ═══ TITLE ═══ -->
-  <div id="title-screen" class="screen">
+  <div id="title-screen" class="screen active">
     <div class="title-coin">🎰</div>
     <div class="title-main">NOT A LOTTERY TICKET<br>8-BIT FUTURES</div>
     <div class="title-sub">"You are not a lottery ticket." — Choose your worldview. Shape your future.</div>
@@ -605,6 +614,7 @@ body {
     <button class="menu-btn" onclick="sfx('coin');go('stance',2)">2 PLAYER HOT-SEAT<span class="menu-hint">Take turns, share the world</span></button>
     <button class="menu-btn" onclick="sfx('select');showScreen('glossary-screen')">HOW TO PLAY<span class="menu-hint">Worldviews, resources, scoring</span></button>
     <div class="blink-text">INSERT COIN TO START</div>
+    <div style="margin-top:30px;font-size:6px;color:var(--dim);"><a href="https://billsantry.com" target="_blank" style="color:var(--dim);text-decoration:none;">© Bill Santry</a></div>
   </div>
 
   <!-- ═══ STANCE SELECT ═══ -->
@@ -621,7 +631,7 @@ body {
         <div class="sc-desc">The future will be better — you just don't know how. Diversify. A/B test everything. Optimize process over substance.</div>
         <div class="sc-stats">⬆ MEDIUM CEILING  ⬇ HIGH FLOOR<br>★ Rewards: breadth, experiments<br>✕ Punishes: tunnel vision</div>
       </div>
-      <div class="stance-card sel" data-s="DP" onclick="pickStance('DP')" tabindex="0">
+      <div class="stance-card" data-s="DP" onclick="pickStance('DP')" tabindex="0">
         <div class="sc-name"><span class="sc-tag" style="background:var(--dp)">DP</span> <span style="color:var(--dp)">DETERMINATE PESSIMISM</span></div>
         <div class="sc-desc">The future looks bleak but you have a plan: ration, defend, build walls. Fortress strategy. Slow and resilient.</div>
         <div class="sc-stats">⬆ LOW CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: reserves, defense<br>✕ Punishes: expansion, speed</div>
@@ -632,84 +642,28 @@ body {
         <div class="sc-stats">⬆ LOW CEILING  ⬇ HIGH SURVIVAL<br>★ Rewards: insurance, compliance<br>✕ Punishes: vision, boldness</div>
       </div>
     </div>
-    <button class="go-btn" id="goBtn" onclick="sfx('start');beginRun()">▶ START RUN</button>
+    <button class="go-btn" id="goBtn" disabled="" onclick="sfx('start');beginRun()">▶ START RUN</button>
   </div>
 
   <!-- ═══ PLAY ═══ -->
-  <div id="play-screen" class="screen active">
+  <div id="play-screen" class="screen">
     <div class="hud">
-      <span class="hud-stance" id="hudStance" style="background: rgb(118, 255, 3);">DP</span>
-      <span class="hud-year" id="hudYear">YEAR 2 / 12</span>
-      <span class="hud-score">SCORE <span class="score-num pulse" id="hudScore">20</span></span>
+      <span class="hud-stance" id="hudStance"></span>
+      <span class="hud-year" id="hudYear">YEAR 1 / 12</span>
+      <span class="hud-score">SCORE <span class="score-num" id="hudScore">0</span></span>
       <span id="hudPlayer" style="display:none;font-size:7px;"></span>
     </div>
-    <div class="timer-row"><div class="timer-fill" id="timerFill" style="width: 73.3333%;"></div></div>
-    <div class="res-row" id="resRow"><div class="res-item">
-      <span style="font-size:10px">⏱</span><span>TIME</span>
-      <div class="res-bar"><div class="res-fill " style="width:100%;background:#42a5f5"></div></div>
-      <span class="res-val ">100</span>
-    </div><div class="res-item">
-      <span style="font-size:10px">💰</span><span>MONEY</span>
-      <div class="res-bar"><div class="res-fill " style="width:33%;background:#ffee58"></div></div>
-      <span class="res-val ">65</span>
-    </div><div class="res-item">
-      <span style="font-size:10px">🎯</span><span>FOCUS</span>
-      <div class="res-bar"><div class="res-fill " style="width:70%;background:#ce93d8"></div></div>
-      <span class="res-val ">70</span>
-    </div><div class="res-item">
-      <span style="font-size:10px">⭐</span><span>REP</span>
-      <div class="res-bar"><div class="res-fill " style="width:38%;background:#ef5350"></div></div>
-      <span class="res-val ">38</span>
-    </div><div class="hv-item"><span>RESILIENCE</span><div class="hv-bar"><div class="hv-fill" style="width:60%;background:var(--dp)"></div></div><span>60</span></div></div>
+    <div class="timer-row"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+    <div class="res-row" id="resRow"></div>
     <div class="main-area">
       <div class="world-col">
-        <canvas id="world-canvas" width="563" height="138"></canvas>
-        <div class="act-count" id="actCount" style="color: var(--accent);">ACTIONS: 3 / 3</div>
-        <div class="action-grid" id="actGrid"><div class="act-card " data-id="save" onclick="doAction('save')">
-      <div class="act-tag" style="background:#76ff03">SAVE</div>
-      <div class="act-name">HOARD CASH LIKE A DRAGON</div>
-      <div class="act-cost">-5T</div>
-      <div class="act-fx">Smaug had the right idea. +15 Money.</div>
-    </div><div class="act-card " data-id="fortify" onclick="doAction('fortify')">
-      <div class="act-tag" style="background:#76ff03">DEFEND</div>
-      <div class="act-name">FORTIFY THE BUNKER</div>
-      <div class="act-cost">-15M -15T</div>
-      <div class="act-fx">Triple redundancy. Faraday cages. +20 Resilience.</div>
-    </div><div class="act-card " data-id="ration" onclick="doAction('ration')">
-      <div class="act-tag" style="background:#76ff03">RATION</div>
-      <div class="act-name">RATION EVERYTHING</div>
-      <div class="act-cost">-10F</div>
-      <div class="act-fx">One ply. Shared desks. Cold brew is a luxury.</div>
-    </div><div class="act-card " data-id="infra" onclick="doAction('infra')">
-      <div class="act-tag" style="background:#76ff03">INFRA</div>
-      <div class="act-name">BUILD INFRASTRUCTURE</div>
-      <div class="act-cost">-25M -20T</div>
-      <div class="act-fx">Boring but indestructible. Like concrete.</div>
-    </div><div class="act-card " data-id="contingency" onclick="doAction('contingency')">
-      <div class="act-tag" style="background:#76ff03">PLAN</div>
-      <div class="act-name">PLAN FOR DOOMSDAY</div>
-      <div class="act-cost">-15T -15F</div>
-      <div class="act-fx">Asteroid? Covered. AI uprising? Covered.</div>
-    </div><div class="act-card " data-id="cut" onclick="doAction('cut')">
-      <div class="act-tag" style="background:#76ff03">CUT</div>
-      <div class="act-name">CUT TO THE BONE</div>
-      <div class="act-cost">-10F</div>
-      <div class="act-fx">Fire the chef. Cancel the retreat. -5 Rep.</div>
-    </div><div class="act-card " data-id="lobby" onclick="doAction('lobby')">
-      <div class="act-tag" style="background:#ff9100">LOBBY</div>
-      <div class="act-name">LOBBY FOR REGULATIONS</div>
-      <div class="act-cost">-20M -10T</div>
-      <div class="act-fx">If we can't win, nobody can play.</div>
-    </div><div class="act-card " data-id="audit" onclick="doAction('audit')">
-      <div class="act-tag" style="background:#ff9100">CHECK</div>
-      <div class="act-name">AUDIT THE AUDITORS</div>
-      <div class="act-cost">-10T -10M</div>
-      <div class="act-fx">Quis custodiet ipsos custodes?</div>
-    </div></div>
+        <canvas id="world-canvas"></canvas>
+        <div class="act-count" id="actCount">ACTIONS: 3 / 3</div>
+        <div class="action-grid" id="actGrid"></div>
       </div>
       <div class="log-col">
         <div class="log-title">◈ EVENT LOG</div>
-        <div class="log-list" id="logList"><div class="log-entry t-year">── YEAR 2 ──</div><div class="log-entry t-shock">SHOCK: EVERYONE LEAVES FOR A STARTUP</div><div class="log-entry t-action">▶ RATION EVERYTHING</div><div class="log-entry t-action">▶ FORTIFY THE BUNKER</div><div class="log-entry t-action">▶ HOARD CASH LIKE A DRAGON</div><div class="log-entry t-year">── YEAR 1 ──</div></div>
+        <div class="log-list" id="logList"></div>
       </div>
     </div>
     <div class="bot-bar">
@@ -719,13 +673,13 @@ body {
   </div>
 
   <!-- ═══ EVENT OVERLAY ═══ -->
-  <div id="event-overlay" class="">
+  <div id="event-overlay">
     <div class="evt-box">
-      <div class="evt-type" id="evtType" style="color: var(--danger);">SHOCK EVENT</div>
-      <div class="evt-name" id="evtName">EVERYONE LEAVES FOR A STARTUP</div>
-      <div class="evt-desc" id="evtDesc">Your best engineers quit to build a crypto-powered dog-walking app. It gets funded.</div>
-      <div class="evt-flavor" id="evtFlavor">The dog-walking thing actually works. You hate everything.</div>
-      <div class="evt-fx" id="evtFx"><span class="fx-neg">-10 Focus</span>  <span class="fx-neg">-3 Rep</span>  </div>
+      <div class="evt-type" id="evtType"></div>
+      <div class="evt-name" id="evtName"></div>
+      <div class="evt-desc" id="evtDesc"></div>
+      <div class="evt-flavor" id="evtFlavor"></div>
+      <div class="evt-fx" id="evtFx"></div>
       <button class="g-btn" onclick="sfx('confirm');resolveEvent()">CONTINUE</button>
     </div>
   </div>
