@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOT A LOTTERY TICKET: 8-BIT FUTURES</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --crt-curve: 0;
+  --scan-opacity: 0.06;
+  --bg: #0a0a12;
+  --panel: #12122a;
+  --panel-border: #2a2a5a;
+  --text: #c8c8e0;
+  --text-dim: #6a6a8a;
+  --accent: #ffcc00;
+  --do-color: #00e5ff;
+  --io-color: #ff6ec7;
+  --dp-color: #76ff03;
+  --ip-color: #ff9100;
+  --danger: #ff1744;
+  --success: #00e676;
+  --res-time: #42a5f5;
+  --res-money: #ffee58;
+  --res-focus: #ce93d8;
+  --res-rep: #ef5350;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  image-rendering: pixelated;
+}
+
+/* CRT Effect Overlay */
+.crt-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,var(--scan-opacity)) 0px,
+    rgba(0,0,0,var(--scan-opacity)) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.crt-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.35) 100%);
+}
+
+/* Screen Container */
+#game {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  position: relative;
+}
+
+/* Shared Panel Style */
+.panel {
+  background: var(--panel);
+  border: 3px solid var(--panel-border);
+  padding: 16px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 10px rgba(42,42,90,0.3);
+}
+
+/* ── TITLE SCREEN ── */
+#title-screen {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+#title-screen h1 {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 10px rgba(255,204,0,0.5);
+  line-height: 1.8;
+}
+
+#title-screen .subtitle {
+  font-size: 7px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.menu-btn {
+  display: block;
+  width: 320px;
+  margin: 8px auto;
+  padding: 14px 20px;
+  background: transparent;
+  border: 2px solid var(--panel-border);
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.1s;
+  position: relative;
+}
+
+.menu-btn:hover, .menu-btn:focus {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(255,204,0,0.05);
+  outline: none;
+}
+
+.menu-btn:hover::before, .menu-btn:focus::before {
+  content: '▶ ';
+  color: var(--accent);
+}
+
+.menu-btn .hint {
+  font-size: 7px;
+  color: var(--text-dim);
+  display: block;
+  margin-top: 4px;
+}
+
+/* ── STANCE SELECT ── */
+#stance-screen {
+  max-width: 860px;
+  width: 100%;
+  text-align: center;
+}
+
+#stance-screen h2 {
+  font-size: 10px;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.stance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stance-card {
+  padding: 14px;
+  border: 2px solid var(--panel-border);
+  background: var(--panel);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.stance-card:hover {
+  transform: scale(1.02);
+}
+
+.stance-card.selected {
+  box-shadow: inset 0 0 20px rgba(255,204,0,0.1);
+}
+
+.stance-card .stance-name {
+  font-size: 9px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stance-card .stance-tag {
+  font-size: 6px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.stance-card .stance-desc {
+  font-size: 7px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.stance-card .stance-stats {
+  font-size: 6px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.stance-card[data-stance="DO"] { border-color: var(--do-color); }
+.stance-card[data-stance="DO"] .stance-name { color: var(--do-color); }
+.stance-card[data-stance="DO"] .stance-tag { background: var(--do-color); color: #000; }
+.stance-card[data-stance="DO"].selected { border-color: var(--do-color); box-shadow: 0 0 15px rgba(0,229,255,0.2), inset 0 0 15px rgba(0,229,255,0.05); }
+
+.stance-card[data-stance="IO"] { border-color: var(--io-color); }
+.stance-card[data-stance="IO"] .stance-name { color: var(--io-color); }
+.stance-card[data-stance="IO"] .stance-tag { background: var(--io-color); color: #000; }
+.stance-card[data-stance="IO"].selected { border-color: var(--io-color); box-shadow: 0 0 15px rgba(255,110,199,0.2), inset 0 0 15px rgba(255,110,199,0.05); }
+
+.stance-card[data-stance="DP"] { border-color: var(--dp-color); }
+.stance-card[data-stance="DP"] .stance-name { color: var(--dp-color); }
+.stance-card[data-stance="DP"] .stance-tag { background: var(--dp-color); color: #000; }
+.stance-card[data-stance="DP"].selected { border-color: var(--dp-color); box-shadow: 0 0 15px rgba(118,255,3,0.2), inset 0 0 15px rgba(118,255,3,0.05); }
+
+.stance-card[data-stance="IP"] { border-color: var(--ip-color); }
+.stance-card[data-stance="IP"] .stance-name { color: var(--ip-color); }
+.stance-card[data-stance="IP"] .stance-tag { background: var(--ip-color); color: #000; }
+.stance-card[data-stance="IP"].selected { border-color: var(--ip-color); box-shadow: 0 0 15px rgba(255,145,0,0.2), inset 0 0 15px rgba(255,145,0,0.05); }
+
+/* ── MAIN GAME SCREEN ── */
+#game-screen {
+  width: 100%;
+  max-width: 960px;
+  height: calc(100vh - 32px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 8px;
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 2px solid var(--panel-border);
+  font-size: 7px;
+}
+
+.top-bar .year-display {
+  color: var(--accent);
+  font-size: 9px;
+}
+
+.top-bar .score-display {
+  font-size: 9px;
+}
+
+.top-bar .stance-badge {
+  padding: 3px 8px;
+  font-size: 7px;
+  border-radius: 2px;
+}
+
+/* Resource Bar */
+.resource-bar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 2px solid var(--panel-border);
+  font-size: 7px;
+  flex-wrap: wrap;
+}
+
+.res-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.res-icon {
+  font-size: 10px;
+}
+
+.res-bar-outer {
+  width: 60px;
+  height: 8px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #333;
+  position: relative;
+  overflow: hidden;
+}
+
+.res-bar-inner {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.res-val {
+  min-width: 28px;
+  text-align: right;
+}
+
+/* Main Play Area */
+.play-area {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Action Panel */
+.action-panel {
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.action-panel h3 {
+  font-size: 8px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.action-card {
+  padding: 10px;
+  border: 2px solid var(--panel-border);
+  background: rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: all 0.1s;
+  font-size: 7px;
+  position: relative;
+}
+
+.action-card:hover {
+  border-color: var(--accent);
+  background: rgba(255,204,0,0.03);
+}
+
+.action-card.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.action-card.used {
+  border-color: var(--success);
+  background: rgba(0,230,118,0.05);
+}
+
+.action-card .action-name {
+  font-size: 8px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.action-card .action-cost {
+  font-size: 6px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.action-card .action-effect {
+  font-size: 6px;
+  color: var(--success);
+  line-height: 1.6;
+}
+
+.action-card .action-stance-tag {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 5px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.actions-remaining {
+  font-size: 7px;
+  text-align: center;
+  padding: 6px;
+  color: var(--accent);
+  border: 1px dashed var(--panel-border);
+  margin-bottom: 4px;
+}
+
+/* Event / Log Panel */
+.log-panel {
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.log-panel h3 {
+  font-size: 8px;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.log-entry {
+  padding: 8px;
+  border-left: 3px solid var(--panel-border);
+  background: rgba(0,0,0,0.2);
+  line-height: 1.7;
+  font-size: 7px;
+}
+
+.log-entry.event-shock { border-color: var(--danger); }
+.log-entry.event-opportunity { border-color: var(--success); }
+.log-entry.event-shift { border-color: var(--io-color); }
+.log-entry.event-singular { border-color: var(--accent); background: rgba(255,204,0,0.05); }
+.log-entry.event-action { border-color: var(--do-color); }
+
+/* Bottom Bar */
+.bottom-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.game-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 10px 24px;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.game-btn:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.game-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.game-btn.secondary {
+  border-color: var(--panel-border);
+  color: var(--text-dim);
+}
+
+.game-btn.secondary:hover {
+  border-color: var(--text-dim);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+
+/* Hidden variable */
+.hidden-var {
+  font-size: 6px;
+  color: var(--text-dim);
+  padding: 4px 8px;
+  border: 1px solid var(--panel-border);
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hidden-var .hv-bar {
+  width: 50px;
+  height: 6px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+.hidden-var .hv-fill {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+/* ── EVENT POPUP ── */
+.event-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.event-popup {
+  max-width: 500px;
+  width: 90%;
+  padding: 24px;
+  text-align: center;
+}
+
+.event-popup .event-type {
+  font-size: 7px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.event-popup .event-title {
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.event-popup .event-desc {
+  font-size: 8px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.event-popup .event-effects {
+  font-size: 7px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--panel-border);
+}
+
+/* ── GAME OVER / SUMMARY ── */
+#summary-screen {
+  max-width: 700px;
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  text-align: center;
+}
+
+#summary-screen h2 {
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+#summary-screen .ending-label {
+  font-size: 9px;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+#summary-screen .ending-blurb {
+  font-size: 7px;
+  color: var(--text-dim);
+  line-height: 1.9;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  background: rgba(0,0,0,0.3);
+  text-align: left;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.summary-stat {
+  padding: 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--panel-border);
+  font-size: 7px;
+}
+
+.summary-stat .stat-label {
+  color: var(--text-dim);
+  font-size: 6px;
+  margin-bottom: 4px;
+}
+
+.summary-stat .stat-val {
+  font-size: 10px;
+  color: var(--accent);
+}
+
+/* Graph area */
+.summary-graph {
+  margin: 12px 0;
+  padding: 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--panel-border);
+}
+
+.summary-graph canvas {
+  width: 100%;
+  height: 120px;
+  image-rendering: pixelated;
+}
+
+/* ── 2P TURN INDICATOR ── */
+.turn-indicator {
+  font-size: 8px;
+  padding: 6px 12px;
+  text-align: center;
+  margin-bottom: 4px;
+  border: 2px solid;
+  animation: pulse-border 1s infinite alternate;
+}
+
+@keyframes pulse-border {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+/* ── TOOLTIP ── */
+.tooltip-layer {
+  position: fixed;
+  background: #1a1a2e;
+  border: 2px solid var(--accent);
+  padding: 8px 10px;
+  font-size: 7px;
+  color: var(--text);
+  line-height: 1.7;
+  max-width: 260px;
+  z-index: 200;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 0 12px rgba(255,204,0,0.2);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--panel-border); }
+
+/* ── SCREEN TRANSITIONS ── */
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; align-items: center; }
+#game-screen.active { display: grid; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .play-area { grid-template-columns: 1fr; grid-template-rows: 1fr 200px; }
+  .stance-grid { grid-template-columns: 1fr; }
+  .summary-stats { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="crt-overlay" id="crtOverlay"></div>
+<div class="tooltip-layer" id="tooltip"></div>
+
+<div id="game">
+  <!-- TITLE SCREEN -->
+  <div id="title-screen" class="screen active panel">
+    <h1>NOT A LOTTERY TICKET<br>8-BIT FUTURES</h1>
+    <div class="subtitle">"You are not a lottery ticket."  — Choose your worldview. Shape your future.</div>
+    <button class="menu-btn" onclick="startModeSelect(1)">
+      ▸ 1 PLAYER RUN
+      <span class="hint">Solo 12-year strategic run</span>
+    </button>
+    <button class="menu-btn" onclick="startModeSelect(2)">
+      ▸ 2 PLAYER HOT-SEAT
+      <span class="hint">Take turns, share the world</span>
+    </button>
+    <button class="menu-btn" onclick="showGlossary()">
+      ▸ GLOSSARY / HOW TO PLAY
+      <span class="hint">Understand the worldviews</span>
+    </button>
+    <div style="margin-top:20px;font-size:6px;color:var(--text-dim);line-height:1.8;">
+      ARROW KEYS + Z/X  or  MOUSE<br>
+      Inspired by Peter Thiel's framework
+    </div>
+  </div>
+
+  <!-- STANCE SELECT -->
+  <div id="stance-screen" class="screen panel">
+    <h2 id="stance-title">CHOOSE YOUR FUTURE STANCE</h2>
+    <div class="stance-grid">
+      <div class="stance-card" data-stance="DO" onclick="selectStance('DO')" tabindex="0">
+        <div class="stance-name"><span class="stance-tag">DO</span> DETERMINATE OPTIMISM</div>
+        <div class="stance-desc">You have a specific plan for a better future. Concentrate your bets. Build conviction. Compound your advantages.</div>
+        <div class="stance-stats">⬆ HIGH CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: planning, sequencing, commitment<br>✕ Punishes: pivoting, distraction, hedging</div>
+      </div>
+      <div class="stance-card" data-stance="IO" onclick="selectStance('IO')" tabindex="0">
+        <div class="stance-name"><span class="stance-tag">IO</span> INDETERMINATE OPTIMISM</div>
+        <div class="stance-desc">The future will be better — you just don't know how. Diversify. A/B test everything. Optimize process. Drift north-east.</div>
+        <div class="stance-stats">⬆ MEDIUM CEILING  ⬇ HIGH FLOOR<br>★ Rewards: breadth, experiments, optionality<br>✕ Punishes: overcommitment, tunnel vision</div>
+      </div>
+      <div class="stance-card" data-stance="DP" onclick="selectStance('DP')" tabindex="0">
+        <div class="stance-name"><span class="stance-tag">DP</span> DETERMINATE PESSIMISM</div>
+        <div class="stance-desc">The future looks bleak but you have a plan: ration, defend, build walls, survive. Fortress strategy. Slow and resilient.</div>
+        <div class="stance-stats">⬆ LOW CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: reserves, defense, preparation<br>✕ Punishes: expansion, ambition</div>
+      </div>
+      <div class="stance-card" data-stance="IP" onclick="selectStance('IP')" tabindex="0">
+        <div class="stance-name"><span class="stance-tag">IP</span> INDETERMINATE PESSIMISM</div>
+        <div class="stance-desc">Things will get worse and nobody knows how. Insure everything. Hedge. Comply. Minimize risk. Survive by not trying.</div>
+        <div class="stance-stats">⬆ LOW CEILING  ⬇ HIGH SURVIVAL<br>★ Rewards: insurance, compliance, caution<br>✕ Punishes: vision, initiative, boldness</div>
+      </div>
+    </div>
+    <button class="game-btn" id="btn-start-run" disabled onclick="beginRun()">START RUN</button>
+  </div>
+
+  <!-- MAIN GAME -->
+  <div id="game-screen" class="screen">
+    <div>
+      <div class="top-bar">
+        <span class="stance-badge" id="g-stance-badge">DO</span>
+        <span class="year-display" id="g-year">YEAR 1 / 12</span>
+        <span class="score-display">SCORE: <span id="g-score">0</span></span>
+        <span id="g-player-indicator" style="display:none;font-size:7px;"></span>
+      </div>
+      <div class="resource-bar" id="g-resources"></div>
+    </div>
+
+    <div class="play-area">
+      <div class="action-panel panel" id="g-actions">
+        <div class="actions-remaining" id="g-actions-remaining">ACTIONS: 3 / 3</div>
+        <h3>AVAILABLE ACTIONS</h3>
+      </div>
+      <div class="log-panel panel" id="g-log">
+        <h3>EVENT LOG</h3>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="game-btn" id="btn-end-year" onclick="endYear()">END YEAR ▸</button>
+      <button class="game-btn secondary" id="btn-undo" onclick="undoAction()" disabled>UNDO</button>
+    </div>
+  </div>
+
+  <!-- EVENT POPUP -->
+  <div class="event-popup-overlay screen" id="event-screen">
+    <div class="event-popup panel" id="event-content"></div>
+  </div>
+
+  <!-- SUMMARY / GAME OVER -->
+  <div id="summary-screen" class="screen panel"></div>
+
+  <!-- GLOSSARY -->
+  <div id="glossary-screen" class="screen panel" style="max-width:700px;max-height:calc(100vh - 40px);overflow-y:auto;text-align:left;font-size:7px;line-height:2;">
+    <h2 style="font-size:10px;color:var(--accent);margin-bottom:16px;text-align:center;">HOW TO PLAY + GLOSSARY</h2>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--accent);">THE GAME:</span> Each run spans 12 Years. Each Year you pick actions (2–4 depending on stance) to allocate resources. Events happen. Your choices compound. At the end, you get a score and an ending.
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--do-color);">DETERMINATE OPTIMISM (DO):</span> You believe the future can be great AND you have a specific plan. In-game: concentrated bets, long-term compounding, conviction meter. High upside, real risk.
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--io-color);">INDETERMINATE OPTIMISM (IO):</span> You believe the future will be great but don't know how. In-game: diversification, A/B tests, process optimization, many small bets. Consistent but capped.
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--dp-color);">DETERMINATE PESSIMISM (DP):</span> You believe the future is bleak and plan accordingly. In-game: rationing, fortress building, reserves. Survive anything, grow slowly.
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--ip-color);">INDETERMINATE PESSIMISM (IP):</span> You believe things will go wrong unpredictably. In-game: insurance, hedging, bureaucracy. Safe but stagnant.
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--accent);">RESOURCES:</span><br>
+      ⏱ TIME — Your most precious resource. Spent on actions. Partially regenerates.<br>
+      💰 MONEY — Capital for building and investing. Grows or decays based on play.<br>
+      🎯 FOCUS — Mental bandwidth. Spread thin = less effective.<br>
+      ⭐ REPUTATION — Social capital. Opens doors or closes them.<br>
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--accent);">HIDDEN VARIABLES:</span><br>
+      Each stance builds a hidden stat: DO builds CONVICTION, IO builds OPTIONALITY, DP builds RESILIENCE, IP builds BUREAUCRACY. These shape event probabilities and endings.
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="color:var(--accent);">SCORING:</span> Score = Breakthrough pts + Wealth pts + Impact pts + Durability pts. Each stance naturally generates different point mixes. There is no single "best" stance — but some have higher ceilings.
+    </div>
+    <div style="margin-bottom:16px;">
+      <span style="color:var(--accent);">THE THESIS:</span> "You are not a lottery ticket." The game argues that your worldview shapes your outcomes through natural mechanisms — not luck. But it lets you feel all four worldviews honestly.
+    </div>
+    <button class="game-btn" onclick="showScreen('title-screen')" style="align-self:center;">BACK</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// NOT A LOTTERY TICKET: 8-BIT FUTURES — Game Engine
+// ═══════════════════════════════════════════════════════════
+
+// ── GAME STATE ────────────────────────────────────────────
+const STATE = {
+  mode: 1, // 1 or 2 player
+  players: [],
+  currentPlayer: 0,
+  year: 1,
+  maxYears: 12,
+  phase: 'title', // title, stance, play, event, summary
+  log: [],
+  worldTension: 50, // shared world state 0-100
+  eventHistory: [],
+};
+
+function newPlayerState(stance) {
+  const base = {
+    stance,
+    resources: { time: 80, money: 60, focus: 70, reputation: 50 },
+    caps: { time: 100, money: 200, focus: 100, reputation: 100 },
+    hidden: { conviction: 0, optionality: 0, resilience: 0, bureaucracy: 0 },
+    score: { breakthrough: 0, wealth: 0, impact: 0, durability: 0 },
+    totalScore: 0,
+    actionsPerYear: 3,
+    actionsUsed: 0,
+    actionHistory: [],
+    yearHistory: [],
+    pivotCount: 0,
+    planChain: 0, // consecutive plan-consistent actions
+    diversitySet: new Set(),
+    insuranceLevel: 0,
+    reserveLevel: 0,
+    productsShipped: 0,
+    prototypesBuilt: 0,
+    undoStack: [],
+  };
+
+  // Stance-specific tuning
+  switch (stance) {
+    case 'DO':
+      base.resources.focus = 80;
+      base.actionsPerYear = 3;
+      base.hidden.conviction = 20;
+      break;
+    case 'IO':
+      base.resources.money = 70;
+      base.actionsPerYear = 4;
+      base.hidden.optionality = 20;
+      break;
+    case 'DP':
+      base.resources.money = 50;
+      base.resources.reputation = 40;
+      base.actionsPerYear = 3;
+      base.hidden.resilience = 20;
+      base.reserveLevel = 10;
+      break;
+    case 'IP':
+      base.resources.money = 55;
+      base.resources.focus = 50;
+      base.actionsPerYear = 2;
+      base.hidden.bureaucracy = 25;
+      base.insuranceLevel = 15;
+      break;
+  }
+  return base;
+}
+
+// ── ACTIONS DATABASE ──────────────────────────────────────
+const ACTIONS = [
+  // DO-aligned
+  { id:'write_plan', name:'WRITE THE SECRET PLAN', stances:['DO'], cost:{time:15,focus:20}, immediate:{conviction:15,focus:-5}, delayed:{breakthrough:8}, desc:'Draft a definite vision. +15 Conviction. Compounding begins.', tag:'PLAN' },
+  { id:'build_proto', name:'BUILD PROTOTYPE', stances:['DO','IO'], cost:{time:20,money:15}, immediate:{reputation:5}, delayed:{breakthrough:12,wealth:5}, desc:'Turn vision into reality. +5 Rep. Breakthrough potential.', tag:'BUILD' },
+  { id:'hire_specialist', name:'HIRE SPECIALISTS', stances:['DO'], cost:{money:25,time:10}, immediate:{focus:15,conviction:8}, delayed:{breakthrough:10}, desc:'Recruit true believers. +15 Focus, +8 Conviction.', tag:'TEAM' },
+  { id:'ship_product', name:'SHIP PRODUCT', stances:['DO','IO'], cost:{time:25,focus:15,money:10}, immediate:{money:20,reputation:15,wealth:15}, delayed:{wealth:10,impact:5}, desc:'Launch into the world. Immediate revenue + reputation.', tag:'SHIP' },
+  { id:'double_down', name:'DOUBLE DOWN', stances:['DO'], cost:{money:30,focus:20}, immediate:{conviction:25}, delayed:{breakthrough:20}, desc:'Concentrate everything on your plan. Massive conviction boost.', tag:'FOCUS' },
+  { id:'expand_market', name:'EXPAND MARKET', stances:['DO','IO'], cost:{money:20,time:15,reputation:5}, immediate:{wealth:10,reputation:10}, delayed:{wealth:15,impact:10}, desc:'Go bigger. New markets, new customers.', tag:'GROW' },
+
+  // IO-aligned
+  { id:'ab_test', name:'A/B TEST EVERYTHING', stances:['IO'], cost:{time:10,money:10}, immediate:{optionality:15,focus:-5}, delayed:{wealth:5}, desc:'Run experiments. Learn what works. +15 Optionality.', tag:'TEST' },
+  { id:'diversify', name:'DIVERSIFY BETS', stances:['IO'], cost:{money:20}, immediate:{optionality:20,money:-5}, delayed:{wealth:8,durability:5}, desc:'Spread your portfolio. Never go to zero.', tag:'SPREAD' },
+  { id:'network', name:'NETWORK AGGRESSIVELY', stances:['IO','DO'], cost:{time:15,focus:10}, immediate:{reputation:15,optionality:10}, delayed:{impact:5}, desc:'Meet everyone. Keep your options open.', tag:'SOCIAL' },
+  { id:'refactor', name:'REFACTOR PROCESS', stances:['IO'], cost:{time:15,focus:15}, immediate:{focus:10,optionality:8}, delayed:{durability:5}, desc:'Optimize your systems. Process > substance.', tag:'PROCESS' },
+  { id:'pivot', name:'PIVOT STRATEGY', stances:['IO'], cost:{time:10,focus:10}, immediate:{optionality:15,conviction:-20}, delayed:{}, desc:'Change direction. Gain options, lose conviction.', tag:'PIVOT' },
+  { id:'hire_generalists', name:'HIRE GENERALISTS', stances:['IO'], cost:{money:15,time:10}, immediate:{focus:10,optionality:10}, delayed:{durability:3}, desc:'Flexible team. Good at many things, great at none.', tag:'TEAM' },
+
+  // DP-aligned
+  { id:'save_cash', name:'SAVE CASH', stances:['DP','IP'], cost:{time:5}, immediate:{money:15,resilience:10}, delayed:{durability:5}, desc:'Hoard resources. Winter is coming.', tag:'SAVE' },
+  { id:'fortify', name:'FORTIFY POSITION', stances:['DP'], cost:{money:15,time:15}, immediate:{resilience:20,reputation:5}, delayed:{durability:10}, desc:'Build walls. Prepare for the worst.', tag:'DEFEND' },
+  { id:'ration', name:'RATION RESOURCES', stances:['DP'], cost:{focus:10}, immediate:{time:10,money:5,resilience:10}, delayed:{durability:5}, desc:'Stretch every unit. Efficiency through scarcity.', tag:'RATION' },
+  { id:'infra', name:'INVEST IN INFRASTRUCTURE', stances:['DP','DO'], cost:{money:25,time:20}, immediate:{resilience:15}, delayed:{wealth:10,durability:15}, desc:'Slow but durable. Build what lasts.', tag:'INFRA' },
+  { id:'contingency', name:'PLAN CONTINGENCIES', stances:['DP'], cost:{time:15,focus:15}, immediate:{resilience:15,conviction:5}, delayed:{durability:8}, desc:'Prepare for every downside scenario.', tag:'PLAN' },
+  { id:'cut_costs', name:'CUT COSTS', stances:['DP','IP'], cost:{focus:10}, immediate:{money:10,reputation:-5,resilience:5}, delayed:{durability:3}, desc:'Trim the fat. Survive leaner.', tag:'CUT' },
+
+  // IP-aligned
+  { id:'buy_insurance', name:'BUY INSURANCE', stances:['IP'], cost:{money:15}, immediate:{bureaucracy:15,resilience:5}, delayed:{durability:5}, desc:'Cover every risk. Sleep well at night.', tag:'INSURE' },
+  { id:'lobby', name:'LOBBY REGULATORS', stances:['IP','DP'], cost:{money:20,time:10}, immediate:{bureaucracy:10,reputation:5}, delayed:{durability:5}, desc:'Influence the rules. Protect incumbents.', tag:'LOBBY' },
+  { id:'comply', name:'FULL COMPLIANCE', stances:['IP'], cost:{time:15,focus:15}, immediate:{bureaucracy:20,reputation:5}, delayed:{durability:8}, desc:'Follow every rule. No risks, no problems.', tag:'COMPLY' },
+  { id:'hedge', name:'HEDGE EVERYTHING', stances:['IP'], cost:{money:20,focus:10}, immediate:{bureaucracy:10,optionality:5,money:-10}, delayed:{durability:5}, desc:'Cancel out every risk with a counter-bet.', tag:'HEDGE' },
+  { id:'outsource', name:'OUTSOURCE DECISIONS', stances:['IP','IO'], cost:{money:10,focus:5}, immediate:{bureaucracy:10,focus:5,conviction:-10}, delayed:{}, desc:'Let committees decide. Diffuse responsibility.', tag:'DEFER' },
+  { id:'audit', name:'RUN AN AUDIT', stances:['IP','DP'], cost:{time:10,money:10}, immediate:{bureaucracy:8,resilience:8,reputation:5}, delayed:{durability:5}, desc:'Check everything twice. Trust nothing.', tag:'CHECK' },
+];
+
+// ── EVENTS DATABASE ───────────────────────────────────────
+const EVENTS = [
+  // SHOCKS (type: 'shock')
+  { id:'recession', name:'RECESSION HITS', type:'shock', desc:'Markets crash. Money evaporates.', effects:{money:-20,reputation:-5}, weight:{DO:0.8,IO:0.9,DP:0.5,IP:0.7}, stateReq:null },
+  { id:'competitor', name:'COMPETITOR EMERGES', type:'shock', desc:'A rival appears with deep pockets.', effects:{reputation:-10,money:-10}, weight:{DO:1.0,IO:0.8,DP:0.6,IP:0.5}, stateReq:null },
+  { id:'regulation', name:'NEW REGULATIONS', type:'shock', desc:'Government cracks down. Compliance costs spike.', effects:{money:-15,time:-10,focus:-10}, weight:{DO:1.0,IO:0.9,DP:0.7,IP:0.3}, stateReq:null },
+  { id:'talent_drain', name:'TALENT EXODUS', type:'shock', desc:'Your best people leave for greener pastures.', effects:{focus:-15,reputation:-5}, weight:{DO:0.7,IO:0.9,DP:0.8,IP:1.0}, stateReq:null },
+  { id:'tech_obsolete', name:'TECH GOES OBSOLETE', type:'shock', desc:'Your core technology is suddenly yesterday\'s news.', effects:{focus:-10,conviction:-15,money:-10}, weight:{DO:1.0,IO:0.5,DP:0.6,IP:0.4}, stateReq:null },
+  { id:'scandal', name:'PUBLIC SCANDAL', type:'shock', desc:'Bad press. Trust collapses overnight.', effects:{reputation:-25,money:-5}, weight:{DO:0.8,IO:0.7,DP:0.5,IP:0.6}, stateReq: (p) => p.resources.reputation > 40 },
+  { id:'supply_crisis', name:'SUPPLY CHAIN CRISIS', type:'shock', desc:'Critical components unavailable.', effects:{money:-15,time:-15}, weight:{DO:0.9,IO:0.7,DP:0.4,IP:0.6}, stateReq:null },
+  { id:'market_crash', name:'MARKET FREEFALL', type:'shock', desc:'Everything drops. Panic selling.', effects:{money:-25,resilience:-5}, weight:{DO:0.8,IO:1.0,DP:0.5,IP:0.6}, stateReq:null },
+  { id:'lawsuit', name:'FRIVOLOUS LAWSUIT', type:'shock', desc:'Legal headaches consume all focus.', effects:{money:-15,focus:-15,time:-10}, weight:{DO:0.7,IO:0.8,DP:0.6,IP:0.3}, stateReq:null },
+  { id:'key_person_leaves', name:'KEY PERSON DEPARTS', type:'shock', desc:'Your most important ally walks away.', effects:{focus:-10,conviction:-10,reputation:-5}, weight:{DO:1.0,IO:0.5,DP:0.7,IP:0.4}, stateReq:null },
+
+  // OPPORTUNITIES (type: 'opportunity')
+  { id:'new_tech', name:'BREAKTHROUGH TECH EMERGES', type:'opportunity', desc:'A new technology appears. First-movers win big.', effects:{focus:10,money:10,breakthrough:5}, weight:{DO:1.2,IO:0.8,DP:0.5,IP:0.3}, stateReq:null },
+  { id:'partner', name:'STRATEGIC PARTNER', type:'opportunity', desc:'A powerful ally offers collaboration.', effects:{money:15,reputation:15}, weight:{DO:1.0,IO:1.0,DP:0.6,IP:0.4}, stateReq:null },
+  { id:'talent_pool', name:'TALENT WAVE', type:'opportunity', desc:'Brilliant people are available and looking.', effects:{focus:15,reputation:5}, weight:{DO:1.0,IO:0.9,DP:0.6,IP:0.5}, stateReq:null },
+  { id:'market_boom', name:'MARKET BOOM', type:'opportunity', desc:'Demand surges. Money flows freely.', effects:{money:25,reputation:5,wealth:5}, weight:{DO:1.0,IO:1.0,DP:0.5,IP:0.4}, stateReq:null },
+  { id:'grant', name:'MAJOR GRANT AWARDED', type:'opportunity', desc:'Free capital with no strings attached.', effects:{money:20}, weight:{DO:0.8,IO:0.7,DP:0.8,IP:0.9}, stateReq:null },
+  { id:'viral_moment', name:'VIRAL MOMENT', type:'opportunity', desc:'Unexpected attention. The world is watching.', effects:{reputation:20,money:5}, weight:{DO:0.9,IO:1.0,DP:0.4,IP:0.3}, stateReq: (p) => p.productsShipped > 0 },
+  { id:'govt_contract', name:'GOVERNMENT CONTRACT', type:'opportunity', desc:'Stable revenue. Bureaucracy required.', effects:{money:20,bureaucracy:10,durability:5}, weight:{DO:0.5,IO:0.6,DP:1.0,IP:1.2}, stateReq:null },
+  { id:'mentor', name:'LEGENDARY MENTOR', type:'opportunity', desc:'A visionary offers guidance.', effects:{conviction:15,focus:10,breakthrough:3}, weight:{DO:1.2,IO:0.7,DP:0.5,IP:0.3}, stateReq:null },
+  { id:'acquisition_offer', name:'ACQUISITION OFFER', type:'opportunity', desc:'Someone wants to buy you out. Big payout, lose control.', effects:{money:40,wealth:20,conviction:-20}, weight:{DO:0.7,IO:1.2,DP:0.5,IP:0.8}, stateReq: (p) => p.resources.reputation > 30 },
+  { id:'cost_reduction', name:'COSTS PLUMMET', type:'opportunity', desc:'Key inputs become dirt cheap.', effects:{money:15,time:5}, weight:{DO:0.8,IO:0.8,DP:1.0,IP:0.8}, stateReq:null },
+
+  // SOCIAL/POLITICAL SHIFTS (type: 'shift')
+  { id:'deregulation', name:'DEREGULATION WAVE', type:'shift', desc:'Rules relax. Movers and builders rejoice.', effects:{money:5,conviction:5,bureaucracy:-10}, weight:{DO:1.2,IO:1.0,DP:0.6,IP:0.4}, stateReq:null },
+  { id:'culture_shift', name:'CULTURAL SHIFT', type:'shift', desc:'Public values change. New demands, old things fade.', effects:{reputation:-5,optionality:10}, weight:{DO:0.7,IO:1.2,DP:0.5,IP:0.6}, stateReq:null },
+  { id:'austerity', name:'AUSTERITY MEASURES', type:'shift', desc:'Everyone tightens belts. Frugality rewarded.', effects:{money:-10,resilience:10}, weight:{DO:0.6,IO:0.7,DP:1.2,IP:1.0}, stateReq:null },
+  { id:'globalization', name:'GLOBALIZATION SURGE', type:'shift', desc:'Borders open. New markets, new competitors.', effects:{money:5,reputation:5,focus:-5}, weight:{DO:1.0,IO:1.1,DP:0.6,IP:0.5}, stateReq:null },
+  { id:'techlash', name:'TECH BACKLASH', type:'shift', desc:'Public turns against innovation. Caution rewarded.', effects:{reputation:-10,bureaucracy:10,conviction:-5}, weight:{DO:0.9,IO:0.8,DP:0.7,IP:1.2}, stateReq:null },
+  { id:'infrastructure_boom', name:'INFRASTRUCTURE BOOM', type:'shift', desc:'Government invests big. Builders benefit.', effects:{money:10,resilience:10}, weight:{DO:0.9,IO:0.7,DP:1.2,IP:0.8}, stateReq:null },
+  { id:'risk_appetite', name:'RISK APPETITE RISES', type:'shift', desc:'Investors get bold. Money chases moonshots.', effects:{money:10,conviction:5,optionality:5}, weight:{DO:1.2,IO:1.0,DP:0.4,IP:0.3}, stateReq:null },
+  { id:'compliance_era', name:'COMPLIANCE ERA', type:'shift', desc:'Audits everywhere. Process wins.', effects:{bureaucracy:15,focus:-5}, weight:{DO:0.5,IO:0.6,DP:0.8,IP:1.3}, stateReq:null },
+  { id:'social_trust_up', name:'TRUST RENAISSANCE', type:'shift', desc:'Society becomes more cooperative.', effects:{reputation:10,focus:5}, weight:{DO:1.0,IO:1.0,DP:0.8,IP:0.7}, stateReq:null },
+  { id:'inequality_crisis', name:'INEQUALITY CRISIS', type:'shift', desc:'Public demands change. Impact matters.', effects:{reputation:-5,impact:5}, weight:{DO:0.8,IO:0.7,DP:0.9,IP:0.8}, stateReq:null },
+
+  // SINGULAR EVENTS (type: 'singular') — rare, high impact, stance-weighted
+  { id:'zero_to_one', name:'0 → 1 BREAKTHROUGH!', type:'singular', desc:'Against all odds, a true original creation. The world will never be the same.', effects:{breakthrough:50,money:30,reputation:30,wealth:30,impact:20}, weight:{DO:2.5,IO:0.3,DP:0.1,IP:0.05}, stateReq: (p) => p.hidden.conviction >= 40 },
+  { id:'monopoly', name:'NATURAL MONOPOLY', type:'singular', desc:'You\'ve captured a market completely. Competition is irrelevant.', effects:{wealth:40,money:40,reputation:10,durability:20}, weight:{DO:1.5,IO:0.4,DP:0.5,IP:0.1}, stateReq: (p) => p.productsShipped >= 2 },
+  { id:'perfect_storm', name:'PERFECT STORM OF FAILURE', type:'singular', desc:'Everything goes wrong simultaneously. Only the prepared survive.', effects:{money:-40,reputation:-20,focus:-20,time:-20}, weight:{DO:0.8,IO:0.8,DP:0.3,IP:0.4}, stateReq:null },
+  { id:'paradigm_shift', name:'PARADIGM SHIFT', type:'singular', desc:'Reality itself changes. Adaptable players thrive.', effects:{optionality:20,conviction:-15,money:10}, weight:{DO:0.5,IO:1.5,DP:0.4,IP:0.3}, stateReq:null },
+  { id:'unicorn', name:'UNICORN MOMENT', type:'singular', desc:'Exponential growth. Everything compounds at once.', effects:{money:50,wealth:30,reputation:20,breakthrough:15}, weight:{DO:2.0,IO:0.7,DP:0.1,IP:0.05}, stateReq: (p) => p.planChain >= 4 },
+  { id:'institution_born', name:'AN INSTITUTION IS BORN', type:'singular', desc:'Your creation transcends you. It will outlast everything.', effects:{durability:50,impact:30,reputation:20,wealth:15}, weight:{DO:1.0,IO:0.5,DP:1.5,IP:0.2}, stateReq: (p) => p.hidden.resilience >= 40 },
+  { id:'black_swan_good', name:'BLACK SWAN (GOOD)', type:'singular', desc:'An impossible stroke of luck. But was it really luck?', effects:{money:35,reputation:15,breakthrough:10}, weight:{DO:1.0,IO:1.0,DP:0.5,IP:0.5}, stateReq:null },
+  { id:'total_collapse', name:'TOTAL MARKET COLLAPSE', type:'singular', desc:'The entire ecosystem implodes. Only fortresses stand.', effects:{money:-50,reputation:-30,focus:-15}, weight:{DO:0.8,IO:0.9,DP:0.2,IP:0.3}, stateReq: (p) => STATE.year >= 6 },
+  { id:'movement', name:'A MOVEMENT IS BORN', type:'singular', desc:'People rally behind your cause. Societal change accelerates.', effects:{impact:40,reputation:25,focus:10}, weight:{DO:1.2,IO:0.8,DP:0.3,IP:0.1}, stateReq: (p) => p.score.impact >= 20 },
+  { id:'portfolio_payoff', name:'PORTFOLIO MEGA-PAYOFF', type:'singular', desc:'One of your many bets pays off spectacularly.', effects:{money:40,wealth:25,optionality:10}, weight:{DO:0.2,IO:2.0,DP:0.3,IP:0.4}, stateReq: (p) => p.hidden.optionality >= 40 },
+];
+
+// ── ENDINGS DATABASE (4 per quadrant) ─────────────────────
+const ENDINGS = {
+  DO: [
+    { id:'do_triumph', label:'THE VISIONARY', condition: (p) => p.score.breakthrough >= 50, blurb:'You saw the future and built it with your bare hands. The world doubted. You didn\'t. A definite plan, executed with conviction, created something that never existed before. This is what 0→1 looks like.', color:'var(--do-color)' },
+    { id:'do_good', label:'THE BUILDER', condition: (p) => p.score.wealth >= 40, blurb:'Your plan wasn\'t perfect, but it was yours — and you stuck with it. The compound interest of conviction paid off. Not a moonshot, but a definite success born of definite thinking.', color:'var(--do-color)' },
+    { id:'do_mid', label:'THE IDEALIST', condition: (p) => p.score.breakthrough >= 15, blurb:'You had the vision but the world wasn\'t ready — or maybe you weren\'t patient enough. The plan was real, the conviction was real, but the execution fell short. Close, but the future slipped away.', color:'var(--do-color)' },
+    { id:'do_fail', label:'THE DREAMER', condition: () => true, blurb:'You bet everything on a specific future that never arrived. The plan crumbled. Conviction without adaptation becomes delusion. The universe doesn\'t owe you a breakthrough just because you believed.', color:'var(--do-color)' },
+  ],
+  IO: [
+    { id:'io_triumph', label:'THE OPTIMIZER', condition: (p) => p.totalScore >= 80, blurb:'You tested everything, diversified perfectly, and drifted north-east into prosperity. No singular breakthrough, but an optimized machine of incremental gains. Is this the best we can do? Maybe. But it works.', color:'var(--io-color)' },
+    { id:'io_good', label:'THE PORTFOLIO', condition: (p) => p.score.wealth >= 30, blurb:'Your diversified approach delivered solid returns. No moonshots, but no catastrophes either. A portfolio of bets, each small, together sufficient. The process worked — but did it create anything new?', color:'var(--io-color)' },
+    { id:'io_mid', label:'THE DRIFTER', condition: (p) => p.score.durability >= 15, blurb:'You spread wide but thin. Lots of activity, lots of experiments, but nothing compounded. The A/B tests optimized for local maxima while the big questions went unasked. Comfortable mediocrity.', color:'var(--io-color)' },
+    { id:'io_fail', label:'THE SPREADSHEET', condition: () => true, blurb:'Process without substance. Testing without thesis. You optimized the wrong things and diversified into nothing. When everything is an option, nothing is a commitment. The future drifted — and so did you.', color:'var(--io-color)' },
+  ],
+  DP: [
+    { id:'dp_triumph', label:'THE FORTRESS', condition: (p) => p.score.durability >= 50, blurb:'You saw the darkness and prepared. While others crashed, you endured. Your walls held, your reserves lasted, and when the dust settled you were the last one standing. Not glamorous — but immortal.', color:'var(--dp-color)' },
+    { id:'dp_good', label:'THE SURVIVOR', condition: (p) => p.score.durability >= 30, blurb:'Rationed, fortified, defended. You survived everything the world threw at you. Growth was slow but losses were slower. In a world of fragile things, durability is its own kind of victory.', color:'var(--dp-color)' },
+    { id:'dp_mid', label:'THE BUNKER', condition: (p) => p.resources.money >= 40, blurb:'You survived — but at what cost? Hunkered down, you watched the world change around you. Your walls kept danger out but also kept opportunity out. Safe, but static.', color:'var(--dp-color)' },
+    { id:'dp_fail', label:'THE RUIN', condition: () => true, blurb:'Even the fortress fell. You planned for a dark future and got one darker. Defensive pessimism without sufficient resources is just slow failure. The walls weren\'t thick enough.', color:'var(--dp-color)' },
+  ],
+  IP: [
+    { id:'ip_triumph', label:'THE INSTITUTION', condition: (p) => p.score.durability >= 40, blurb:'You insured everything, hedged every bet, followed every rule — and outlasted everyone. Not through vision but through sheer bureaucratic immortality. Is this winning? The paperwork says yes.', color:'var(--ip-color)' },
+    { id:'ip_good', label:'THE BUREAUCRAT', condition: (p) => p.hidden.bureaucracy >= 50, blurb:'Every risk was covered. Every form was filed. You didn\'t build anything new, but you also didn\'t lose anything old. In a world of chaos, the insurance policy was the product all along.', color:'var(--ip-color)' },
+    { id:'ip_mid', label:'THE STAGNANT', condition: (p) => p.resources.money >= 20, blurb:'Nothing ventured, nothing gained — literally. Your hedges cancelled out your bets. Your insurance ate your capital. You existed, but did you live? The spreadsheet says: net zero.', color:'var(--ip-color)' },
+    { id:'ip_fail', label:'THE VOID', condition: () => true, blurb:'You tried to avoid all risk and found the biggest risk of all: irrelevance. While you were filing forms, the world moved on. No vision, no plan, no agency. The lottery ticket metaphor was too kind.', color:'var(--ip-color)' },
+  ],
+};
+
+// ── ACHIEVEMENTS ──────────────────────────────────────────
+const ACHIEVEMENTS = [
+  { id:'zero_to_one', name:'0→1', desc:'Trigger a singular breakthrough event', check: (p) => p.score.breakthrough >= 50 },
+  { id:'fortress', name:'FORTRESS', desc:'End with Resilience > 60 and survive all shocks', check: (p) => p.hidden.resilience >= 60 },
+  { id:'portfolio_king', name:'PORTFOLIO KING', desc:'Have Optionality > 70 in a single run', check: (p) => p.hidden.optionality >= 70 },
+  { id:'paper_pusher', name:'PAPER PUSHER', desc:'Max out Bureaucracy', check: (p) => p.hidden.bureaucracy >= 80 },
+  { id:'conviction', name:'TRUE BELIEVER', desc:'Maintain a 6+ action plan chain', check: (p) => p.planChain >= 6 },
+  { id:'rich', name:'MONEYBAGS', desc:'End with 150+ Money', check: (p) => p.resources.money >= 150 },
+  { id:'famous', name:'FAMOUS', desc:'Hit 90+ Reputation', check: (p) => p.resources.reputation >= 90 },
+  { id:'shipper', name:'SERIAL SHIPPER', desc:'Ship 4+ products in one run', check: (p) => p.productsShipped >= 4 },
+];
+
+// ── TRAITS (unlockable perks) ─────────────────────────────
+const TRAITS = [
+  { id:'early_bird', name:'EARLY BIRD', desc:'+10 Time at start', effect: (p) => { p.resources.time += 10; } },
+  { id:'silver_spoon', name:'SILVER SPOON', desc:'+20 Money at start', effect: (p) => { p.resources.money += 20; } },
+  { id:'prodigy', name:'PRODIGY', desc:'+15 Focus at start', effect: (p) => { p.resources.focus += 15; } },
+  { id:'connected', name:'WELL CONNECTED', desc:'+15 Reputation at start', effect: (p) => { p.resources.reputation += 15; } },
+  { id:'stubborn', name:'STUBBORN', desc:'Conviction decays 50% slower', effect: (p) => { p._stubbornTrait = true; } },
+  { id:'nimble', name:'NIMBLE', desc:'+1 action per year', effect: (p) => { p.actionsPerYear += 1; } },
+  { id:'paranoid', name:'PARANOID', desc:'+15 starting Resilience', effect: (p) => { p.hidden.resilience += 15; } },
+  { id:'bureaucrat', name:'BORN BUREAUCRAT', desc:'Insurance costs 30% less', effect: (p) => { p._cheapInsurance = true; } },
+  { id:'visionary', name:'VISIONARY', desc:'Singular events 20% more likely', effect: (p) => { p._visionaryTrait = true; } },
+  { id:'hustler', name:'HUSTLER', desc:'+5 Money each Year', effect: (p) => { p._hustlerTrait = true; } },
+  { id:'stoic', name:'STOIC', desc:'Shock damage reduced 25%', effect: (p) => { p._stoicTrait = true; } },
+  { id:'lucky', name:'LUCKY', desc:'Opportunity events slightly more common', effect: (p) => { p._luckyTrait = true; } },
+];
+
+// ── SCREEN MANAGEMENT ─────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showGlossary() { showScreen('glossary-screen'); }
+
+// ── MODE SELECT ───────────────────────────────────────────
+let pendingStances = [];
+function startModeSelect(mode) {
+  STATE.mode = mode;
+  pendingStances = [];
+  if (mode === 2) {
+    document.getElementById('stance-title').textContent = 'PLAYER 1: CHOOSE YOUR STANCE';
+  } else {
+    document.getElementById('stance-title').textContent = 'CHOOSE YOUR FUTURE STANCE';
+  }
+  showScreen('stance-screen');
+  document.getElementById('btn-start-run').disabled = true;
+  document.querySelectorAll('.stance-card').forEach(c => c.classList.remove('selected'));
+}
+
+let selectedStance = null;
+function selectStance(stance) {
+  selectedStance = stance;
+  document.querySelectorAll('.stance-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.stance-card[data-stance="${stance}"]`).classList.add('selected');
+  document.getElementById('btn-start-run').disabled = false;
+}
+
+function beginRun() {
+  if (!selectedStance) return;
+  pendingStances.push(selectedStance);
+
+  if (STATE.mode === 2 && pendingStances.length === 1) {
+    document.getElementById('stance-title').textContent = 'PLAYER 2: CHOOSE YOUR STANCE';
+    selectedStance = null;
+    document.querySelectorAll('.stance-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('btn-start-run').disabled = true;
+    return;
+  }
+
+  // Initialize game
+  STATE.year = 1;
+  STATE.currentPlayer = 0;
+  STATE.log = [];
+  STATE.eventHistory = [];
+  STATE.worldTension = 50;
+  STATE.players = pendingStances.map(s => newPlayerState(s));
+  selectedStance = null;
+
+  showScreen('game-screen');
+  startYear();
+}
+
+// ── GAME LOOP ─────────────────────────────────────────────
+function currentPlayer() { return STATE.players[STATE.currentPlayer]; }
+
+function startYear() {
+  const p = currentPlayer();
+  p.actionsUsed = 0;
+  p.undoStack = [];
+
+  // Regen / decay
+  regenDecay(p);
+
+  // Render
+  renderTopBar();
+  renderResources();
+  renderActions();
+  renderLog();
+  document.getElementById('btn-end-year').disabled = false;
+  document.getElementById('btn-undo').disabled = true;
+}
+
+function regenDecay(p) {
+  // Time partially regenerates
+  p.resources.time = Math.min(p.caps.time, p.resources.time + 15);
+  // Focus partially regenerates
+  p.resources.focus = Math.min(p.caps.focus, p.resources.focus + 10);
+  // Money: small passive income
+  if (p._hustlerTrait) p.resources.money += 5;
+  p.resources.money = Math.min(p.caps.money, p.resources.money + 5);
+  // Reputation decays slightly
+  p.resources.reputation = Math.max(0, p.resources.reputation - 2);
+
+  // Hidden variable decay
+  if (p.stance !== 'DO') p.hidden.conviction = Math.max(0, p.hidden.conviction - (p._stubbornTrait ? 2 : 4));
+  if (p.stance !== 'IO') p.hidden.optionality = Math.max(0, p.hidden.optionality - 3);
+  if (p.stance !== 'DP') p.hidden.resilience = Math.max(0, p.hidden.resilience - 2);
+  if (p.stance !== 'IP') p.hidden.bureaucracy = Math.max(0, p.hidden.bureaucracy - 2);
+
+  // Clamp
+  Object.keys(p.resources).forEach(k => {
+    p.resources[k] = Math.max(0, Math.min(p.caps[k], Math.round(p.resources[k])));
+  });
+}
+
+function getAvailableActions(p) {
+  return ACTIONS.filter(a => {
+    // Must be for this stance or universal
+    if (!a.stances.includes(p.stance)) return false;
+    // Check cost affordability
+    for (const [res, cost] of Object.entries(a.cost)) {
+      if ((p.resources[res] || 0) < cost) return false;
+    }
+    return true;
+  });
+}
+
+function executeAction(actionId) {
+  const p = currentPlayer();
+  if (p.actionsUsed >= p.actionsPerYear) return;
+
+  const action = ACTIONS.find(a => a.id === actionId);
+  if (!action) return;
+
+  // Check affordability
+  for (const [res, cost] of Object.entries(action.cost)) {
+    if ((p.resources[res] || 0) < cost) return;
+  }
+
+  // Save undo state
+  p.undoStack.push(JSON.parse(JSON.stringify({
+    resources: p.resources,
+    hidden: p.hidden,
+    score: p.score,
+    actionsUsed: p.actionsUsed,
+    planChain: p.planChain,
+    diversitySet: [...p.diversitySet],
+    productsShipped: p.productsShipped,
+    prototypesBuilt: p.prototypesBuilt,
+    insuranceLevel: p.insuranceLevel,
+    reserveLevel: p.reserveLevel,
+  })));
+
+  // Pay costs
+  for (const [res, cost] of Object.entries(action.cost)) {
+    p.resources[res] -= cost;
+  }
+
+  // Apply immediate effects
+  for (const [key, val] of Object.entries(action.immediate)) {
+    if (key in p.resources) {
+      p.resources[key] = Math.max(0, Math.min(p.caps[key], p.resources[key] + val));
+    } else if (key in p.hidden) {
+      p.hidden[key] = Math.max(0, Math.min(100, p.hidden[key] + val));
+    }
+  }
+
+  // Apply delayed/score effects
+  for (const [key, val] of Object.entries(action.delayed)) {
+    if (key in p.score) {
+      p.score[key] += val;
+    }
+  }
+
+  // Track plan chain (DO mechanic)
+  if (action.stances.includes('DO') && action.stances.length <= 2 && p.stance === 'DO') {
+    p.planChain++;
+    // Compounding bonus for long chains
+    if (p.planChain >= 3) {
+      const bonus = Math.floor(p.planChain * 1.5);
+      p.score.breakthrough += bonus;
+      p.hidden.conviction = Math.min(100, p.hidden.conviction + 3);
+    }
+  } else if (p.stance === 'DO' && action.id === 'pivot') {
+    p.planChain = 0;
+    p.pivotCount++;
+  }
+
+  // Track diversity (IO mechanic)
+  p.diversitySet.add(action.tag);
+  if (p.stance === 'IO' && p.diversitySet.size >= 4) {
+    p.hidden.optionality = Math.min(100, p.hidden.optionality + 3);
+  }
+
+  // Track specific actions
+  if (action.id === 'ship_product') p.productsShipped++;
+  if (action.id === 'build_proto') p.prototypesBuilt++;
+  if (action.id === 'buy_insurance') p.insuranceLevel += 10;
+  if (action.id === 'fortify' || action.id === 'save_cash') p.reserveLevel += 10;
+
+  p.actionsUsed++;
+  p.actionHistory.push(action.id);
+
+  addLog(`Used: ${action.name}`, 'event-action');
+
+  // Re-render
+  renderResources();
+  renderActions();
+  document.getElementById('btn-undo').disabled = false;
+}
+
+function undoAction() {
+  const p = currentPlayer();
+  if (p.undoStack.length === 0) return;
+  const prev = p.undoStack.pop();
+  p.resources = prev.resources;
+  p.hidden = prev.hidden;
+  p.score = prev.score;
+  p.actionsUsed = prev.actionsUsed;
+  p.planChain = prev.planChain;
+  p.diversitySet = new Set(prev.diversitySet);
+  p.productsShipped = prev.productsShipped;
+  p.prototypesBuilt = prev.prototypesBuilt;
+  p.insuranceLevel = prev.insuranceLevel;
+  p.reserveLevel = prev.reserveLevel;
+  p.actionHistory.pop();
+  STATE.log.pop();
+  renderResources();
+  renderActions();
+  renderLog();
+  document.getElementById('btn-undo').disabled = p.undoStack.length === 0;
+}
+
+function endYear() {
+  const p = currentPlayer();
+
+  // Save year snapshot
+  p.yearHistory.push({
+    year: STATE.year,
+    money: p.resources.money,
+    reputation: p.resources.reputation,
+    conviction: p.hidden.conviction,
+    optionality: p.hidden.optionality,
+    resilience: p.hidden.resilience,
+    bureaucracy: p.hidden.bureaucracy,
+    score: { ...p.score },
+  });
+
+  // In 2-player, switch to player 2 for same year
+  if (STATE.mode === 2 && STATE.currentPlayer === 0) {
+    STATE.currentPlayer = 1;
+    addLog('--- PLAYER 2 TURN ---', 'event-shift');
+    startYear();
+    return;
+  }
+
+  // Both players done (or 1P) — run events, then next year
+  document.getElementById('btn-end-year').disabled = true;
+  generateEvent();
+}
+
+// ── EVENT ENGINE ──────────────────────────────────────────
+function generateEvent() {
+  const p = currentPlayer();
+
+  // Determine event type distribution based on year and world tension
+  const yearFactor = STATE.year / STATE.maxYears; // 0..1
+  let shockChance = 0.25 + yearFactor * 0.15 + (STATE.worldTension - 50) * 0.003;
+  let oppChance = 0.30 - yearFactor * 0.05;
+  let shiftChance = 0.25;
+  let singularChance = 0.05 + yearFactor * 0.08;
+
+  // Stance modifiers
+  if (p.hidden.resilience > 40) shockChance *= 0.7;
+  if (p.hidden.bureaucracy > 40) shockChance *= 0.8;
+  if (p.hidden.conviction > 50) singularChance *= 1.3;
+  if (p.hidden.optionality > 50) oppChance *= 1.2;
+  if (p._visionaryTrait) singularChance *= 1.2;
+  if (p._luckyTrait) oppChance *= 1.15;
+
+  // Normalize
+  const total = shockChance + oppChance + shiftChance + singularChance;
+  shockChance /= total; oppChance /= total; shiftChance /= total; singularChance /= total;
+
+  // Roll type
+  const roll = Math.random();
+  let eventType;
+  if (roll < shockChance) eventType = 'shock';
+  else if (roll < shockChance + oppChance) eventType = 'opportunity';
+  else if (roll < shockChance + oppChance + shiftChance) eventType = 'shift';
+  else eventType = 'singular';
+
+  // Filter events by type and state requirements
+  let candidates = EVENTS.filter(e => {
+    if (e.type !== eventType) return false;
+    if (e.stateReq && !e.stateReq(p)) return false;
+    if (STATE.eventHistory.slice(-3).includes(e.id)) return false; // no recent repeats
+    return true;
+  });
+
+  // Fallback
+  if (candidates.length === 0) {
+    candidates = EVENTS.filter(e => e.type === 'shift' && !STATE.eventHistory.slice(-3).includes(e.id));
+  }
+  if (candidates.length === 0) {
+    candidates = EVENTS.filter(e => e.type === 'shift');
+  }
+
+  // Weight by stance
+  const stance = p.stance;
+  const weighted = candidates.map(e => ({
+    event: e,
+    weight: (e.weight[stance] || 0.5) + Math.random() * 0.3
+  }));
+  weighted.sort((a, b) => b.weight - a.weight);
+  const chosen = weighted[0].event;
+  STATE.eventHistory.push(chosen.id);
+
+  // Show event popup
+  showEventPopup(chosen, p);
+}
+
+function showEventPopup(event, p) {
+  const typeColors = {
+    shock: 'var(--danger)', opportunity: 'var(--success)',
+    shift: 'var(--io-color)', singular: 'var(--accent)'
+  };
+
+  // Calculate actual effects (with trait modifiers)
+  const actualEffects = { ...event.effects };
+  if (p._stoicTrait && event.type === 'shock') {
+    Object.keys(actualEffects).forEach(k => {
+      if (actualEffects[k] < 0) actualEffects[k] = Math.round(actualEffects[k] * 0.75);
+    });
+  }
+
+  // Insurance protection for IP
+  if (event.type === 'shock' && p.insuranceLevel > 0) {
+    const protection = Math.min(0.5, p.insuranceLevel / 100);
+    Object.keys(actualEffects).forEach(k => {
+      if (actualEffects[k] < 0) actualEffects[k] = Math.round(actualEffects[k] * (1 - protection));
+    });
+  }
+
+  // Resilience protection for DP
+  if (event.type === 'shock' && p.hidden.resilience > 20) {
+    const protection = Math.min(0.4, p.hidden.resilience / 200);
+    Object.keys(actualEffects).forEach(k => {
+      if (actualEffects[k] < 0) actualEffects[k] = Math.round(actualEffects[k] * (1 - protection));
+    });
+  }
+
+  let effectsHTML = '';
+  for (const [key, val] of Object.entries(actualEffects)) {
+    const sign = val >= 0 ? '+' : '';
+    const color = val >= 0 ? 'var(--success)' : 'var(--danger)';
+    const label = key.charAt(0).toUpperCase() + key.slice(1);
+    effectsHTML += `<span style="color:${color}">${sign}${val} ${label}</span>  `;
+  }
+
+  const content = document.getElementById('event-content');
+  content.innerHTML = `
+    <div class="event-type" style="color:${typeColors[event.type]}">${event.type.toUpperCase()} EVENT</div>
+    <div class="event-title">${event.name}</div>
+    <div class="event-desc">${event.desc}</div>
+    <div class="event-effects">${effectsHTML}</div>
+    <button class="game-btn" onclick="resolveEvent()">CONTINUE</button>
+  `;
+  content._eventData = { event, actualEffects };
+  showScreen('event-screen');
+}
+
+function resolveEvent() {
+  const { event, actualEffects } = document.getElementById('event-content')._eventData;
+
+  // Apply effects to all players in 2P (shared world), or just current player in 1P
+  const targets = STATE.mode === 2 ? STATE.players : [currentPlayer()];
+
+  targets.forEach(p => {
+    for (const [key, val] of Object.entries(actualEffects)) {
+      if (key in p.resources) {
+        p.resources[key] = Math.max(0, Math.min(p.caps[key], p.resources[key] + val));
+      } else if (key in p.hidden) {
+        p.hidden[key] = Math.max(0, Math.min(100, p.hidden[key] + val));
+      } else if (key in p.score) {
+        p.score[key] += val;
+      }
+    }
+  });
+
+  // Update world tension
+  if (event.type === 'shock') STATE.worldTension = Math.min(100, STATE.worldTension + 8);
+  else if (event.type === 'opportunity') STATE.worldTension = Math.max(0, STATE.worldTension - 5);
+  else if (event.type === 'singular') STATE.worldTension += (event.effects.money > 0 ? -10 : 15);
+
+  addLog(`${event.type.toUpperCase()}: ${event.name}`, `event-${event.type}`);
+
+  // Advance
+  if (STATE.mode === 2) STATE.currentPlayer = 0;
+  STATE.year++;
+
+  if (STATE.year > STATE.maxYears) {
+    endRun();
+  } else {
+    showScreen('game-screen');
+    startYear();
+  }
+}
+
+// ── END OF RUN ────────────────────────────────────────────
+function endRun() {
+  // Calculate final scores for each player
+  STATE.players.forEach(p => {
+    // Bonus from hidden variables
+    p.score.breakthrough += Math.floor(p.hidden.conviction / 5);
+    p.score.durability += Math.floor(p.hidden.resilience / 4);
+    p.score.durability += Math.floor(p.hidden.bureaucracy / 6);
+    p.score.wealth += Math.floor(p.resources.money / 5);
+    p.score.impact += Math.floor(p.resources.reputation / 5);
+
+    p.totalScore = p.score.breakthrough + p.score.wealth + p.score.impact + p.score.durability;
+  });
+
+  renderSummary();
+}
+
+function getEnding(p) {
+  const endings = ENDINGS[p.stance];
+  for (const e of endings) {
+    if (e.condition(p)) return e;
+  }
+  return endings[endings.length - 1];
+}
+
+function renderSummary() {
+  const container = document.getElementById('summary-screen');
+  let html = '<h2>RUN COMPLETE</h2>';
+
+  STATE.players.forEach((p, idx) => {
+    const ending = getEnding(p);
+    const stanceColors = { DO:'var(--do-color)', IO:'var(--io-color)', DP:'var(--dp-color)', IP:'var(--ip-color)' };
+    const stanceColor = stanceColors[p.stance];
+
+    if (STATE.mode === 2) {
+      html += `<div style="font-size:9px;color:${stanceColor};margin:12px 0 6px;">PLAYER ${idx + 1} — ${p.stance}</div>`;
+    }
+
+    html += `<div class="ending-label" style="color:${ending.color}">${ending.label}</div>`;
+    html += `<div class="ending-blurb">${ending.blurb}</div>`;
+
+    html += `<div class="summary-stats">
+      <div class="summary-stat"><div class="stat-label">TOTAL SCORE</div><div class="stat-val">${p.totalScore}</div></div>
+      <div class="summary-stat"><div class="stat-label">BREAKTHROUGH</div><div class="stat-val" style="color:var(--do-color)">${p.score.breakthrough}</div></div>
+      <div class="summary-stat"><div class="stat-label">WEALTH</div><div class="stat-val" style="color:var(--res-money)">${p.score.wealth}</div></div>
+      <div class="summary-stat"><div class="stat-label">IMPACT</div><div class="stat-val" style="color:var(--io-color)">${p.score.impact}</div></div>
+      <div class="summary-stat"><div class="stat-label">DURABILITY</div><div class="stat-val" style="color:var(--dp-color)">${p.score.durability}</div></div>
+      <div class="summary-stat"><div class="stat-label">FINAL MONEY</div><div class="stat-val">${p.resources.money}</div></div>
+      <div class="summary-stat"><div class="stat-label">CONVICTION</div><div class="stat-val">${p.hidden.conviction}</div></div>
+      <div class="summary-stat"><div class="stat-label">OPTIONALITY</div><div class="stat-val">${p.hidden.optionality}</div></div>
+      <div class="summary-stat"><div class="stat-label">PLAN CHAIN</div><div class="stat-val">${p.planChain}</div></div>
+      <div class="summary-stat"><div class="stat-label">PRODUCTS SHIPPED</div><div class="stat-val">${p.productsShipped}</div></div>
+    </div>`;
+
+    // Achievements
+    const earned = ACHIEVEMENTS.filter(a => a.check(p));
+    if (earned.length > 0) {
+      html += `<div style="text-align:left;margin-bottom:16px;">`;
+      html += `<div style="font-size:7px;color:var(--accent);margin-bottom:6px;">ACHIEVEMENTS EARNED:</div>`;
+      earned.forEach(a => {
+        html += `<div style="font-size:7px;padding:4px 8px;margin:4px 0;border:1px solid var(--accent);background:rgba(255,204,0,0.05);">★ ${a.name} — ${a.desc}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Mini growth chart
+    html += `<div class="summary-graph"><canvas id="chart-${idx}" width="600" height="120"></canvas></div>`;
+  });
+
+  html += `<div style="display:flex;gap:12px;justify-content:center;margin-top:16px;">
+    <button class="game-btn" onclick="startModeSelect(${STATE.mode})">PLAY AGAIN</button>
+    <button class="game-btn secondary" onclick="showScreen('title-screen')">TITLE SCREEN</button>
+  </div>`;
+
+  container.innerHTML = html;
+  showScreen('summary-screen');
+
+  // Draw charts after render
+  setTimeout(() => {
+    STATE.players.forEach((p, idx) => {
+      drawChart(`chart-${idx}`, p);
+    });
+  }, 100);
+}
+
+function drawChart(canvasId, p) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0, 0, W, H);
+
+  if (p.yearHistory.length < 2) return;
+
+  // Draw money line
+  const maxMoney = Math.max(...p.yearHistory.map(y => y.money), 1);
+  const maxConv = 100;
+
+  function drawLine(data, maxVal, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    data.forEach((val, i) => {
+      const x = (i / (data.length - 1)) * (W - 40) + 20;
+      const y = H - 15 - (val / maxVal) * (H - 30);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  drawLine(p.yearHistory.map(y => y.money), maxMoney, '#ffee58');
+  drawLine(p.yearHistory.map(y => y.conviction), maxConv, '#00e5ff');
+  drawLine(p.yearHistory.map(y => y.optionality), maxConv, '#ff6ec7');
+  drawLine(p.yearHistory.map(y => y.resilience), maxConv, '#76ff03');
+
+  // Legend
+  ctx.font = '8px monospace';
+  ctx.fillStyle = '#ffee58'; ctx.fillText('MONEY', 10, 12);
+  ctx.fillStyle = '#00e5ff'; ctx.fillText('CONV', 80, 12);
+  ctx.fillStyle = '#ff6ec7'; ctx.fillText('OPT', 140, 12);
+  ctx.fillStyle = '#76ff03'; ctx.fillText('RES', 185, 12);
+
+  // Year labels
+  ctx.fillStyle = '#555';
+  ctx.font = '7px monospace';
+  p.yearHistory.forEach((y, i) => {
+    const x = (i / (p.yearHistory.length - 1)) * (W - 40) + 16;
+    ctx.fillText(`Y${y.year}`, x, H - 2);
+  });
+}
+
+// ── RENDERING ─────────────────────────────────────────────
+function renderTopBar() {
+  const p = currentPlayer();
+  const stanceColors = { DO:'var(--do-color)', IO:'var(--io-color)', DP:'var(--dp-color)', IP:'var(--ip-color)' };
+  document.getElementById('g-stance-badge').textContent = p.stance;
+  document.getElementById('g-stance-badge').style.background = stanceColors[p.stance];
+  document.getElementById('g-stance-badge').style.color = '#000';
+  document.getElementById('g-year').textContent = `YEAR ${STATE.year} / ${STATE.maxYears}`;
+  document.getElementById('g-score').textContent = p.score.breakthrough + p.score.wealth + p.score.impact + p.score.durability;
+
+  const indicator = document.getElementById('g-player-indicator');
+  if (STATE.mode === 2) {
+    indicator.style.display = 'inline';
+    indicator.textContent = `P${STATE.currentPlayer + 1} TURN`;
+    indicator.style.color = stanceColors[p.stance];
+  } else {
+    indicator.style.display = 'none';
+  }
+}
+
+function renderResources() {
+  const p = currentPlayer();
+  const resConfig = [
+    { key: 'time', icon: '⏱', label: 'TIME', color: 'var(--res-time)' },
+    { key: 'money', icon: '💰', label: 'MONEY', color: 'var(--res-money)' },
+    { key: 'focus', icon: '🎯', label: 'FOCUS', color: 'var(--res-focus)' },
+    { key: 'reputation', icon: '⭐', label: 'REP', color: 'var(--res-rep)' },
+  ];
+
+  const hiddenConfig = {
+    DO: { key: 'conviction', label: 'CONVICTION', color: 'var(--do-color)' },
+    IO: { key: 'optionality', label: 'OPTIONALITY', color: 'var(--io-color)' },
+    DP: { key: 'resilience', label: 'RESILIENCE', color: 'var(--dp-color)' },
+    IP: { key: 'bureaucracy', label: 'BUREAUCRACY', color: 'var(--ip-color)' },
+  };
+
+  let html = '';
+  resConfig.forEach(r => {
+    const pct = Math.round((p.resources[r.key] / p.caps[r.key]) * 100);
+    html += `<div class="res-item">
+      <span class="res-icon">${r.icon}</span>
+      <span>${r.label}</span>
+      <div class="res-bar-outer"><div class="res-bar-inner" style="width:${pct}%;background:${r.color}"></div></div>
+      <span class="res-val">${p.resources[r.key]}</span>
+    </div>`;
+  });
+
+  // Hidden variable
+  const hv = hiddenConfig[p.stance];
+  const hvPct = Math.round(p.hidden[hv.key]);
+  html += `<div class="hidden-var">
+    <span>${hv.label}</span>
+    <div class="hv-bar"><div class="hv-fill" style="width:${hvPct}%;background:${hv.color}"></div></div>
+    <span>${hvPct}</span>
+  </div>`;
+
+  document.getElementById('g-resources').innerHTML = html;
+}
+
+function renderActions() {
+  const p = currentPlayer();
+  const remaining = p.actionsPerYear - p.actionsUsed;
+  const panel = document.getElementById('g-actions');
+
+  let html = `<div class="actions-remaining">ACTIONS: ${remaining} / ${p.actionsPerYear}</div>`;
+  html += `<h3>AVAILABLE ACTIONS</h3>`;
+
+  const available = ACTIONS.filter(a => a.stances.includes(p.stance));
+  const stanceColors = { DO:'var(--do-color)', IO:'var(--io-color)', DP:'var(--dp-color)', IP:'var(--ip-color)' };
+
+  available.forEach(a => {
+    let affordable = true;
+    for (const [res, cost] of Object.entries(a.cost)) {
+      if ((p.resources[res] || 0) < cost) { affordable = false; break; }
+    }
+    const disabled = !affordable || remaining <= 0;
+    const costStr = Object.entries(a.cost).map(([k, v]) => `-${v} ${k.charAt(0).toUpperCase() + k.slice(1)}`).join(', ');
+
+    html += `<div class="action-card ${disabled ? 'disabled' : ''}" onclick="${disabled ? '' : `executeAction('${a.id}')`}">
+      <div class="action-stance-tag" style="background:${stanceColors[a.stances[0]]};color:#000;">${a.tag}</div>
+      <div class="action-name">${a.name}</div>
+      <div class="action-cost">${costStr}</div>
+      <div class="action-effect">${a.desc}</div>
+    </div>`;
+  });
+
+  panel.innerHTML = html;
+}
+
+function addLog(text, className = '') {
+  STATE.log.push({ text, className });
+  renderLog();
+}
+
+function renderLog() {
+  const logPanel = document.getElementById('g-log');
+  let html = '<h3>EVENT LOG</h3>';
+  // Show last 20 entries
+  const entries = STATE.log.slice(-20);
+  entries.reverse().forEach(entry => {
+    html += `<div class="log-entry ${entry.className}">${entry.text}</div>`;
+  });
+  logPanel.innerHTML = html;
+}
+
+// ── KEYBOARD SUPPORT ──────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (STATE.phase === 'event') resolveEvent();
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────
+showScreen('title-screen');
+</script>
+
+</body>
+</html>
