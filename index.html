@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+  
 <html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +34,6 @@ body {
   width: 100vw;
 }
 
-/* ── CRT + SCANLINES ── */
 #crt {
   pointer-events: none;
   position: fixed;
@@ -47,15 +48,12 @@ body {
   background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.4) 100%);
 }
 
-/* ── SCREEN SHAKE ── */
 #game-root {
   width:100vw; height:100vh;
   position:relative;
   transition: transform 0.05s;
 }
-#game-root.shake {
-  animation: shakeAnim 0.4s ease-out;
-}
+#game-root.shake { animation: shakeAnim 0.4s ease-out; }
 @keyframes shakeAnim {
   0% { transform: translate(0,0); }
   15% { transform: translate(-8px, 4px); }
@@ -66,7 +64,6 @@ body {
   100% { transform: translate(0,0); }
 }
 
-/* ── PARTICLE CANVAS ── */
 #particles {
   position: fixed;
   inset: 0;
@@ -74,7 +71,6 @@ body {
   pointer-events: none;
 }
 
-/* ── FLOATING SCORE POPUPS ── */
 .float-popup {
   position: fixed;
   z-index: 60;
@@ -90,40 +86,41 @@ body {
   100% { opacity:0; transform: translateY(-90px) scale(0.8); }
 }
 
-/* ── COMBO BANNER ── */
 #combo-banner {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0);
   z-index: 70;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--accent);
   text-shadow: 0 0 20px rgba(255,204,0,0.8), 0 0 40px rgba(255,204,0,0.4);
   pointer-events: none;
   opacity: 0;
   white-space: nowrap;
+  text-align: center;
+  max-width: 90vw;
 }
-#combo-banner.show {
-  animation: comboPop 1.5s ease-out forwards;
-}
+#combo-banner.show { animation: comboPop 1.5s ease-out forwards; }
 @keyframes comboPop {
   0% { opacity:0; transform: translate(-50%,-50%) scale(0.3) rotate(-5deg); }
   15% { opacity:1; transform: translate(-50%,-50%) scale(1.3) rotate(2deg); }
   30% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
-  70% { opacity:1; transform: translate(-50%,-50%) scale(1); }
+  70% { opacity:1; }
   100% { opacity:0; transform: translate(-50%,-50%) scale(1.5); }
 }
 
 /* ── SCREENS ── */
 .screen { display:none; position:absolute; inset:0; }
-.screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.screen.active {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
 
 /* ── TITLE ── */
-#title-screen {
-  text-align: center;
-  padding: 20px;
-}
+#title-screen { text-align: center; padding: 20px; }
 
 .title-main {
   font-size: 10px;
@@ -204,15 +201,15 @@ body {
   color: var(--dim);
   margin-top: 30px;
 }
-@keyframes blink {
-  50% { opacity: 0; }
-}
+@keyframes blink { 50% { opacity: 0; } }
 
 /* ── STANCE SELECT ── */
 #stance-screen {
   padding: 20px;
   max-width: 900px;
   width: 100%;
+  align-items: center;
+  text-align: center;
 }
 
 .stance-title {
@@ -227,6 +224,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .stance-card {
@@ -237,6 +235,7 @@ body {
   transition: all 0.2s;
   position: relative;
   overflow: hidden;
+  text-align: left;
 }
 .stance-card::after {
   content: '';
@@ -246,9 +245,7 @@ body {
   transition: opacity 0.3s;
 }
 .stance-card:hover { transform: translateY(-2px); }
-.stance-card.sel {
-  transform: scale(1.02);
-}
+.stance-card.sel { transform: scale(1.02); }
 
 .stance-card[data-s="DO"] { border-color: #00e5ff33; }
 .stance-card[data-s="DO"].sel { border-color: var(--do); box-shadow: 0 0 20px rgba(0,229,255,0.2), inset 0 0 30px rgba(0,229,255,0.05); }
@@ -297,10 +294,7 @@ body {
 .go-btn:disabled { opacity: 0.25; cursor: default; }
 
 /* ── MAIN GAME ── */
-#play-screen {
-  display: none;
-  padding: 8px;
-}
+#play-screen { display: none; padding: 8px; }
 #play-screen.active {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
@@ -309,7 +303,6 @@ body {
   width: 100vw;
 }
 
-/* TOP HUD */
 .hud {
   display: flex;
   align-items: center;
@@ -319,14 +312,10 @@ body {
   border: 2px solid var(--border);
   font-size: 7px;
 }
-.hud-stance {
-  padding: 3px 10px;
-  font-size: 8px;
-  color: #000;
-}
+.hud-stance { padding: 3px 10px; font-size: 8px; color: #000; }
 .hud-year { color: var(--accent); font-size: 10px; }
 .hud-score { font-size: 9px; }
-.score-num { transition: all 0.3s; }
+.score-num { transition: all 0.3s; display: inline-block; }
 .score-num.pulse { animation: scorePulse 0.4s ease-out; }
 @keyframes scorePulse {
   0% { transform: scale(1); }
@@ -334,7 +323,6 @@ body {
   100% { transform: scale(1); }
 }
 
-/* TIMER BAR */
 .timer-row {
   height: 6px;
   background: #000;
@@ -347,11 +335,8 @@ body {
   transition: width 0.1s linear;
 }
 .timer-fill.low { background: var(--danger); animation: timerPulse 0.5s infinite; }
-@keyframes timerPulse {
-  50% { opacity: 0.5; }
-}
+@keyframes timerPulse { 50% { opacity: 0.5; } }
 
-/* RESOURCE BARS */
 .res-row {
   display: flex;
   gap: 12px;
@@ -362,18 +347,12 @@ body {
   align-items: center;
   flex-wrap: wrap;
 }
-.res-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
+.res-item { display: flex; align-items: center; gap: 5px; }
 .res-bar {
-  width: 55px;
-  height: 10px;
+  width: 55px; height: 10px;
   background: #0a0a0a;
   border: 1px solid #333;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .res-fill {
   height: 100%;
@@ -383,45 +362,26 @@ body {
 .res-fill::after {
   content: '';
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 3px;
-  height: 100%;
+  top: 0; right: 0;
+  width: 3px; height: 100%;
   background: rgba(255,255,255,0.4);
 }
 .res-fill.flash { animation: resFlash 0.3s ease-out; }
-@keyframes resFlash {
-  0% { filter: brightness(2); }
-  100% { filter: brightness(1); }
-}
-.res-val {
-  min-width: 24px;
-  text-align: right;
-  font-size: 7px;
-  transition: color 0.3s;
-}
+@keyframes resFlash { 0% { filter: brightness(2); } 100% { filter: brightness(1); } }
+.res-val { min-width: 24px; text-align: right; font-size: 7px; transition: color 0.3s; }
 .res-val.up { color: var(--success); }
 .res-val.down { color: var(--danger); }
 
 .hv-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  display: flex; align-items: center; gap: 5px;
   padding: 2px 8px;
   border: 1px solid var(--border);
   background: rgba(0,0,0,0.4);
   font-size: 6px;
 }
-.hv-bar {
-  width: 50px;
-  height: 6px;
-  background: #0a0a0a;
-  border: 1px solid #333;
-  overflow: hidden;
-}
+.hv-bar { width: 50px; height: 6px; background: #0a0a0a; border: 1px solid #333; overflow: hidden; }
 .hv-fill { height: 100%; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 
-/* MAIN SPLIT */
 .main-area {
   display: grid;
   grid-template-columns: 1fr 220px;
@@ -429,17 +389,9 @@ body {
   min-height: 0;
   overflow: hidden;
 }
-
-/* WORLD CANVAS */
-.world-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-}
+.world-col { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 #world-canvas {
-  flex: 1;
-  width: 100%;
+  flex: 1; width: 100%;
   background: var(--panel);
   border: 2px solid var(--border);
   image-rendering: pixelated;
@@ -463,6 +415,7 @@ body {
   font-size: 6px;
   position: relative;
   overflow: hidden;
+  text-align: left;
 }
 .act-card::before {
   content: '';
@@ -475,82 +428,36 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
-.act-card.off {
-  opacity: 0.25;
-  cursor: default;
-  filter: grayscale(0.8);
-}
-.act-card.used {
-  border-color: var(--success);
-  box-shadow: inset 0 0 12px rgba(0,230,118,0.08);
-}
-.act-card .act-name {
-  font-size: 7px;
-  margin-bottom: 3px;
-  color: var(--text);
-}
-.act-card .act-cost {
-  color: var(--dim);
-  margin-bottom: 2px;
-}
-.act-card .act-fx {
-  color: #8f8;
-  line-height: 1.6;
-}
-.act-tag {
-  position: absolute;
-  top: 3px;
-  right: 4px;
-  font-size: 5px;
-  padding: 1px 4px;
-  color: #000;
-}
+.act-card.off { opacity: 0.25; cursor: default; filter: grayscale(0.8); }
+.act-card .act-name { font-size: 7px; margin-bottom: 3px; color: var(--text); }
+.act-card .act-cost { color: var(--dim); margin-bottom: 2px; }
+.act-card .act-fx { color: #8f8; line-height: 1.6; }
+.act-tag { position: absolute; top: 3px; right: 4px; font-size: 5px; padding: 1px 4px; color: #000; }
 
-/* ACTION COUNT */
 .act-count {
-  text-align: center;
-  font-size: 8px;
-  padding: 6px;
+  text-align: center; font-size: 8px; padding: 6px;
   color: var(--accent);
   border: 1px dashed var(--border);
   margin-bottom: 4px;
   background: var(--panel);
 }
 
-/* LOG PANEL */
 .log-col {
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
   background: var(--panel);
   border: 2px solid var(--border);
   overflow: hidden;
 }
-.log-title {
-  font-size: 7px;
-  color: var(--accent);
-  padding: 8px;
-  border-bottom: 1px solid var(--border);
-}
-.log-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.log-title { font-size: 7px; color: var(--accent); padding: 8px; border-bottom: 1px solid var(--border); }
+.log-list { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
 .log-entry {
-  padding: 6px;
-  font-size: 6px;
-  line-height: 1.6;
+  padding: 6px; font-size: 6px; line-height: 1.6;
   border-left: 3px solid var(--border);
   background: rgba(0,0,0,0.25);
   animation: logSlideIn 0.3s ease-out;
+  text-align: left;
 }
-@keyframes logSlideIn {
-  from { opacity: 0; transform: translateX(15px); }
-  to { opacity: 1; transform: translateX(0); }
-}
+@keyframes logSlideIn { from { opacity:0; transform:translateX(15px); } to { opacity:1; transform:translateX(0); } }
 .log-entry.t-shock { border-color: var(--danger); }
 .log-entry.t-opp { border-color: var(--success); }
 .log-entry.t-shift { border-color: var(--io); }
@@ -558,32 +465,18 @@ body {
 .log-entry.t-action { border-color: var(--do); }
 .log-entry.t-year { border-color: var(--dim); color: var(--dim); font-style: italic; }
 
-/* BOTTOM */
-.bot-bar {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 6px;
-}
+.bot-bar { display: flex; justify-content: center; gap: 10px; padding: 6px; }
 .g-btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  padding: 12px 28px;
+  font-size: 9px; padding: 12px 28px;
   border: 2px solid var(--accent);
-  background: transparent;
-  color: var(--accent);
-  cursor: pointer;
-  transition: all 0.15s;
-  position: relative;
-  overflow: hidden;
+  background: transparent; color: var(--accent);
+  cursor: pointer; transition: all 0.15s;
+  position: relative; overflow: hidden;
 }
 .g-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  opacity: 0;
-  transition: opacity 0.15s;
+  content: ''; position: absolute; inset: 0;
+  background: var(--accent); opacity: 0; transition: opacity 0.15s;
 }
 .g-btn:hover::after { opacity: 0.15; }
 .g-btn:hover { box-shadow: 0 0 20px rgba(255,204,0,0.2); }
@@ -594,61 +487,32 @@ body {
 
 /* ── EVENT OVERLAY ── */
 #event-overlay {
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background: rgba(0,0,0,0);
   z-index: 80;
   display: none;
-  align-items: center;
-  justify-content: center;
+  align-items: center; justify-content: center;
   transition: background 0.4s;
 }
-#event-overlay.show {
-  display: flex;
-  background: rgba(0,0,0,0.75);
-}
+#event-overlay.show { display: flex; background: rgba(0,0,0,0.75); }
 .evt-box {
-  max-width: 500px;
-  width: 90%;
-  padding: 28px;
+  max-width: 520px; width: 90%; padding: 28px;
   background: var(--panel);
   border: 3px solid var(--border);
   text-align: center;
-  transform: scale(0.8);
-  opacity: 0;
+  transform: scale(0.8); opacity: 0;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-#event-overlay.show .evt-box {
-  transform: scale(1);
-  opacity: 1;
-}
-.evt-type {
-  font-size: 7px;
-  letter-spacing: 3px;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-.evt-name {
-  font-size: 11px;
-  color: var(--accent);
-  margin-bottom: 14px;
-  line-height: 1.8;
-  text-shadow: 0 0 10px rgba(255,204,0,0.3);
-}
-.evt-desc {
-  font-size: 7px;
-  color: var(--dim);
-  line-height: 2;
-  margin-bottom: 16px;
-  min-height: 40px;
-}
+#event-overlay.show .evt-box { transform: scale(1); opacity: 1; }
+.evt-type { font-size: 7px; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; }
+.evt-name { font-size: 11px; color: var(--accent); margin-bottom: 14px; line-height: 1.8; text-shadow: 0 0 10px rgba(255,204,0,0.3); }
+.evt-desc { font-size: 7px; color: var(--dim); line-height: 2.2; margin-bottom: 16px; min-height: 40px; }
+.evt-flavor { font-size: 6px; color: var(--dim); font-style: italic; margin-bottom: 12px; line-height: 1.8; opacity: 0.7; }
 .evt-fx {
-  font-size: 7px;
-  padding: 8px;
+  font-size: 7px; padding: 8px;
   background: rgba(0,0,0,0.4);
   border: 1px solid var(--border);
-  margin-bottom: 18px;
-  line-height: 2;
+  margin-bottom: 18px; line-height: 2;
 }
 .fx-pos { color: var(--success); }
 .fx-neg { color: var(--danger); }
@@ -660,24 +524,17 @@ body {
   width: 100%;
   max-height: 100vh;
   overflow-y: auto;
+  align-items: center;
+  text-align: center;
 }
 .sum-title {
-  font-size: 12px;
-  color: var(--accent);
-  text-align: center;
-  margin-bottom: 8px;
+  font-size: 12px; color: var(--accent);
+  text-align: center; margin-bottom: 8px;
   text-shadow: 0 0 15px rgba(255,204,0,0.5);
 }
-.sum-ending {
-  font-size: 10px;
-  text-align: center;
-  margin-bottom: 8px;
-  line-height: 1.6;
-}
+.sum-ending { font-size: 10px; text-align: center; margin-bottom: 8px; line-height: 1.6; }
 .sum-blurb {
-  font-size: 7px;
-  color: var(--dim);
-  line-height: 2;
+  font-size: 7px; color: var(--dim); line-height: 2.2;
   padding: 14px;
   border: 1px solid var(--border);
   background: rgba(0,0,0,0.3);
@@ -687,8 +544,8 @@ body {
 .sum-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 6px; margin-bottom: 16px;
+  width: 100%;
 }
 .sum-stat {
   padding: 10px;
@@ -698,46 +555,30 @@ body {
 }
 .sum-stat .sl { font-size: 6px; color: var(--dim); margin-bottom: 4px; }
 .sum-stat .sv { font-size: 14px; }
-.sum-stat .sv.animating {
-  animation: countUp 0.6s ease-out;
-}
-@keyframes countUp {
-  from { opacity:0; transform: translateY(10px); }
-  to { opacity:1; transform: translateY(0); }
-}
 .sum-chart {
-  margin: 12px 0;
+  margin: 12px 0; width: 100%;
   background: rgba(0,0,0,0.3);
   border: 1px solid var(--border);
   padding: 8px;
 }
-.sum-chart canvas {
-  width: 100%;
-  height: 140px;
-  image-rendering: pixelated;
-}
-.sum-achv {
-  margin-bottom: 16px;
-}
+.sum-chart canvas { width: 100%; height: 140px; image-rendering: pixelated; }
+.sum-achv { margin-bottom: 16px; width: 100%; }
 .achv-item {
-  font-size: 7px;
-  padding: 6px 10px;
-  margin: 4px 0;
+  font-size: 7px; padding: 6px 10px; margin: 4px 0;
   border: 1px solid var(--accent);
   background: rgba(255,204,0,0.04);
   animation: achvPop 0.4s ease-out backwards;
+  text-align: left;
 }
 
 /* ── GLOSSARY ── */
 #glossary-screen {
-  padding: 24px;
-  max-width: 700px;
-  width: 100%;
-  max-height: 100vh;
-  overflow-y: auto;
-  font-size: 7px;
-  line-height: 2.2;
+  padding: 24px; max-width: 700px; width: 100%;
+  max-height: 100vh; overflow-y: auto;
+  font-size: 7px; line-height: 2.2;
+  text-align: center;
 }
+#glossary-screen > div { text-align: left; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 800px) {
@@ -754,14 +595,14 @@ body {
 <canvas id="particles" width="1465" height="429"></canvas>
 <div id="combo-banner"></div>
 
-<div id="game-root">
+<div id="game-root" class="">
   <!-- ═══ TITLE ═══ -->
-  <div id="title-screen" class="screen active">
+  <div id="title-screen" class="screen">
     <div class="title-coin">🎰</div>
     <div class="title-main">NOT A LOTTERY TICKET<br>8-BIT FUTURES</div>
     <div class="title-sub">"You are not a lottery ticket." — Choose your worldview. Shape your future.</div>
-    <button class="menu-btn" onclick="sfx('select');go('stance',1)">1 PLAYER RUN<span class="menu-hint">Solo 12-year strategic run</span></button>
-    <button class="menu-btn" onclick="sfx('select');go('stance',2)">2 PLAYER HOT-SEAT<span class="menu-hint">Take turns, share the world</span></button>
+    <button class="menu-btn" onclick="sfx('coin');go('stance',1)">1 PLAYER RUN<span class="menu-hint">Solo 12-year strategic run</span></button>
+    <button class="menu-btn" onclick="sfx('coin');go('stance',2)">2 PLAYER HOT-SEAT<span class="menu-hint">Take turns, share the world</span></button>
     <button class="menu-btn" onclick="sfx('select');showScreen('glossary-screen')">HOW TO PLAY<span class="menu-hint">Worldviews, resources, scoring</span></button>
     <div class="blink-text">INSERT COIN TO START</div>
   </div>
@@ -773,50 +614,104 @@ body {
       <div class="stance-card" data-s="DO" onclick="pickStance('DO')" tabindex="0">
         <div class="sc-name"><span class="sc-tag" style="background:var(--do)">DO</span> <span style="color:var(--do)">DETERMINATE OPTIMISM</span></div>
         <div class="sc-desc">You have a specific plan for a better future. Concentrate your bets. Build conviction. Compound advantages over time.</div>
-        <div class="sc-stats">⬆ HIGH CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: planning, conviction chains, sequencing<br>✕ Punishes: pivoting, hedging, distraction</div>
+        <div class="sc-stats">⬆ HIGH CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: planning, conviction chains<br>✕ Punishes: pivoting, hedging</div>
       </div>
       <div class="stance-card" data-s="IO" onclick="pickStance('IO')" tabindex="0">
         <div class="sc-name"><span class="sc-tag" style="background:var(--io)">IO</span> <span style="color:var(--io)">INDETERMINATE OPTIMISM</span></div>
         <div class="sc-desc">The future will be better — you just don't know how. Diversify. A/B test everything. Optimize process over substance.</div>
-        <div class="sc-stats">⬆ MEDIUM CEILING  ⬇ HIGH FLOOR<br>★ Rewards: breadth, experiments, diversity<br>✕ Punishes: tunnel vision, overcommitment</div>
+        <div class="sc-stats">⬆ MEDIUM CEILING  ⬇ HIGH FLOOR<br>★ Rewards: breadth, experiments<br>✕ Punishes: tunnel vision</div>
       </div>
-      <div class="stance-card" data-s="DP" onclick="pickStance('DP')" tabindex="0">
+      <div class="stance-card sel" data-s="DP" onclick="pickStance('DP')" tabindex="0">
         <div class="sc-name"><span class="sc-tag" style="background:var(--dp)">DP</span> <span style="color:var(--dp)">DETERMINATE PESSIMISM</span></div>
         <div class="sc-desc">The future looks bleak but you have a plan: ration, defend, build walls. Fortress strategy. Slow and resilient.</div>
-        <div class="sc-stats">⬆ LOW CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: reserves, defense, preparation<br>✕ Punishes: expansion, ambition, speed</div>
+        <div class="sc-stats">⬆ LOW CEILING  ⬇ MEDIUM FLOOR<br>★ Rewards: reserves, defense<br>✕ Punishes: expansion, speed</div>
       </div>
       <div class="stance-card" data-s="IP" onclick="pickStance('IP')" tabindex="0">
         <div class="sc-name"><span class="sc-tag" style="background:var(--ip)">IP</span> <span style="color:var(--ip)">INDETERMINATE PESSIMISM</span></div>
         <div class="sc-desc">Things will get worse and nobody knows how. Insure everything. Hedge. Comply. Survive by not trying.</div>
-        <div class="sc-stats">⬆ LOW CEILING  ⬇ HIGH SURVIVAL<br>★ Rewards: insurance, compliance, caution<br>✕ Punishes: vision, initiative, boldness</div>
+        <div class="sc-stats">⬆ LOW CEILING  ⬇ HIGH SURVIVAL<br>★ Rewards: insurance, compliance<br>✕ Punishes: vision, boldness</div>
       </div>
     </div>
-    <button class="go-btn" id="goBtn" disabled="" onclick="sfx('start');beginRun()">▶ START RUN</button>
+    <button class="go-btn" id="goBtn" onclick="sfx('start');beginRun()">▶ START RUN</button>
   </div>
 
   <!-- ═══ PLAY ═══ -->
-  <div id="play-screen" class="screen">
+  <div id="play-screen" class="screen active">
     <div class="hud">
-      <span class="hud-stance" id="hudStance"></span>
-      <span class="hud-year" id="hudYear">YEAR 1 / 12</span>
-      <span class="hud-score">SCORE <span class="score-num" id="hudScore">0</span></span>
+      <span class="hud-stance" id="hudStance" style="background: rgb(118, 255, 3);">DP</span>
+      <span class="hud-year" id="hudYear">YEAR 2 / 12</span>
+      <span class="hud-score">SCORE <span class="score-num pulse" id="hudScore">20</span></span>
       <span id="hudPlayer" style="display:none;font-size:7px;"></span>
     </div>
-    <div class="timer-row"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
-    <div class="res-row" id="resRow"></div>
-
+    <div class="timer-row"><div class="timer-fill" id="timerFill" style="width: 73.3333%;"></div></div>
+    <div class="res-row" id="resRow"><div class="res-item">
+      <span style="font-size:10px">⏱</span><span>TIME</span>
+      <div class="res-bar"><div class="res-fill " style="width:100%;background:#42a5f5"></div></div>
+      <span class="res-val ">100</span>
+    </div><div class="res-item">
+      <span style="font-size:10px">💰</span><span>MONEY</span>
+      <div class="res-bar"><div class="res-fill " style="width:33%;background:#ffee58"></div></div>
+      <span class="res-val ">65</span>
+    </div><div class="res-item">
+      <span style="font-size:10px">🎯</span><span>FOCUS</span>
+      <div class="res-bar"><div class="res-fill " style="width:70%;background:#ce93d8"></div></div>
+      <span class="res-val ">70</span>
+    </div><div class="res-item">
+      <span style="font-size:10px">⭐</span><span>REP</span>
+      <div class="res-bar"><div class="res-fill " style="width:38%;background:#ef5350"></div></div>
+      <span class="res-val ">38</span>
+    </div><div class="hv-item"><span>RESILIENCE</span><div class="hv-bar"><div class="hv-fill" style="width:60%;background:var(--dp)"></div></div><span>60</span></div></div>
     <div class="main-area">
       <div class="world-col">
-        <canvas id="world-canvas"></canvas>
-        <div class="act-count" id="actCount">ACTIONS: 3 / 3</div>
-        <div class="action-grid" id="actGrid"></div>
+        <canvas id="world-canvas" width="563" height="138"></canvas>
+        <div class="act-count" id="actCount" style="color: var(--accent);">ACTIONS: 3 / 3</div>
+        <div class="action-grid" id="actGrid"><div class="act-card " data-id="save" onclick="doAction('save')">
+      <div class="act-tag" style="background:#76ff03">SAVE</div>
+      <div class="act-name">HOARD CASH LIKE A DRAGON</div>
+      <div class="act-cost">-5T</div>
+      <div class="act-fx">Smaug had the right idea. +15 Money.</div>
+    </div><div class="act-card " data-id="fortify" onclick="doAction('fortify')">
+      <div class="act-tag" style="background:#76ff03">DEFEND</div>
+      <div class="act-name">FORTIFY THE BUNKER</div>
+      <div class="act-cost">-15M -15T</div>
+      <div class="act-fx">Triple redundancy. Faraday cages. +20 Resilience.</div>
+    </div><div class="act-card " data-id="ration" onclick="doAction('ration')">
+      <div class="act-tag" style="background:#76ff03">RATION</div>
+      <div class="act-name">RATION EVERYTHING</div>
+      <div class="act-cost">-10F</div>
+      <div class="act-fx">One ply. Shared desks. Cold brew is a luxury.</div>
+    </div><div class="act-card " data-id="infra" onclick="doAction('infra')">
+      <div class="act-tag" style="background:#76ff03">INFRA</div>
+      <div class="act-name">BUILD INFRASTRUCTURE</div>
+      <div class="act-cost">-25M -20T</div>
+      <div class="act-fx">Boring but indestructible. Like concrete.</div>
+    </div><div class="act-card " data-id="contingency" onclick="doAction('contingency')">
+      <div class="act-tag" style="background:#76ff03">PLAN</div>
+      <div class="act-name">PLAN FOR DOOMSDAY</div>
+      <div class="act-cost">-15T -15F</div>
+      <div class="act-fx">Asteroid? Covered. AI uprising? Covered.</div>
+    </div><div class="act-card " data-id="cut" onclick="doAction('cut')">
+      <div class="act-tag" style="background:#76ff03">CUT</div>
+      <div class="act-name">CUT TO THE BONE</div>
+      <div class="act-cost">-10F</div>
+      <div class="act-fx">Fire the chef. Cancel the retreat. -5 Rep.</div>
+    </div><div class="act-card " data-id="lobby" onclick="doAction('lobby')">
+      <div class="act-tag" style="background:#ff9100">LOBBY</div>
+      <div class="act-name">LOBBY FOR REGULATIONS</div>
+      <div class="act-cost">-20M -10T</div>
+      <div class="act-fx">If we can't win, nobody can play.</div>
+    </div><div class="act-card " data-id="audit" onclick="doAction('audit')">
+      <div class="act-tag" style="background:#ff9100">CHECK</div>
+      <div class="act-name">AUDIT THE AUDITORS</div>
+      <div class="act-cost">-10T -10M</div>
+      <div class="act-fx">Quis custodiet ipsos custodes?</div>
+    </div></div>
       </div>
       <div class="log-col">
         <div class="log-title">◈ EVENT LOG</div>
-        <div class="log-list" id="logList"></div>
+        <div class="log-list" id="logList"><div class="log-entry t-year">── YEAR 2 ──</div><div class="log-entry t-shock">SHOCK: EVERYONE LEAVES FOR A STARTUP</div><div class="log-entry t-action">▶ RATION EVERYTHING</div><div class="log-entry t-action">▶ FORTIFY THE BUNKER</div><div class="log-entry t-action">▶ HOARD CASH LIKE A DRAGON</div><div class="log-entry t-year">── YEAR 1 ──</div></div>
       </div>
     </div>
-
     <div class="bot-bar">
       <button class="g-btn" id="btnEnd" onclick="sfx('confirm');endYear()">END YEAR ▶</button>
       <button class="g-btn sec" id="btnUndo" onclick="sfx('back');undo()" disabled="">UNDO</button>
@@ -824,12 +719,13 @@ body {
   </div>
 
   <!-- ═══ EVENT OVERLAY ═══ -->
-  <div id="event-overlay">
+  <div id="event-overlay" class="">
     <div class="evt-box">
-      <div class="evt-type" id="evtType"></div>
-      <div class="evt-name" id="evtName"></div>
-      <div class="evt-desc" id="evtDesc"></div>
-      <div class="evt-fx" id="evtFx"></div>
+      <div class="evt-type" id="evtType" style="color: var(--danger);">SHOCK EVENT</div>
+      <div class="evt-name" id="evtName">EVERYONE LEAVES FOR A STARTUP</div>
+      <div class="evt-desc" id="evtDesc">Your best engineers quit to build a crypto-powered dog-walking app. It gets funded.</div>
+      <div class="evt-flavor" id="evtFlavor">The dog-walking thing actually works. You hate everything.</div>
+      <div class="evt-fx" id="evtFx"><span class="fx-neg">-10 Focus</span>  <span class="fx-neg">-3 Rep</span>  </div>
       <button class="g-btn" onclick="sfx('confirm');resolveEvent()">CONTINUE</button>
     </div>
   </div>
@@ -839,78 +735,139 @@ body {
 
   <!-- ═══ GLOSSARY ═══ -->
   <div id="glossary-screen" class="screen">
-    <div style="text-align:center;font-size:10px;color:var(--accent);margin-bottom:18px;">HOW TO PLAY</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--accent);">THE GAME:</span> Each run = 12 Years. Each Year, pick actions to spend resources. An event fires. Your worldview shapes everything. Score is tallied at the end.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--accent);">TIMER:</span> Each year has a countdown. Act fast — this is an arcade! If time runs out, the year ends with whatever actions you took.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--do);">DO — DETERMINATE OPTIMISM:</span> Chain consistent actions. Build Conviction. The plan compounds. High ceiling, but pivoting kills your momentum.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--io);">IO — INDETERMINATE OPTIMISM:</span> Use diverse action types. Build Optionality. You get 4 actions/year. Consistent but capped — you drift upward but never break through.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--dp);">DP — DETERMINATE PESSIMISM:</span> Hoard and fortify. Build Resilience. Shocks barely hurt you. Slow growth, high survival.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--ip);">IP — INDETERMINATE PESSIMISM:</span> Insure and comply. Build Bureaucracy. Only 2 actions/year. You survive everything but build nothing.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--accent);">RESOURCES:</span> ⏱ Time, 💰 Money, 🎯 Focus, ⭐ Reputation — manage them carefully.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--accent);">THE WORLD:</span> Watch your city grow (or crumble) on the pixel canvas. Buildings, smoke, lightning — the world reacts to your choices in real time.</div>
-    <div style="margin-bottom:10px;"><span style="color:var(--accent);">SCORING:</span> Breakthrough + Wealth + Impact + Durability. Each stance generates different point mixes. Multiple endings per stance.</div>
-    <div style="margin-bottom:16px;"><span style="color:var(--accent);">THE THESIS:</span> "You are not a lottery ticket." Your worldview shapes outcomes through natural mechanisms. Feel why each stance leads where it does.</div>
+    <div style="font-size:10px;color:var(--accent);margin-bottom:18px;">HOW TO PLAY</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--accent);">THE GAME:</span> Each run = 12 Years. Each Year, pick actions to spend resources. An event fires. Your worldview shapes everything. Score tallied at end.</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--accent);">TIMER:</span> Each year has a 30s countdown. Act fast — this is an arcade!</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--do);">DO — DETERMINATE OPTIMISM:</span> Chain consistent actions. Build Conviction. The plan compounds. High ceiling, but pivoting kills momentum.</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--io);">IO — INDETERMINATE OPTIMISM:</span> Use diverse action types. Build Optionality. 4 actions/year. Consistent but capped.</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--dp);">DP — DETERMINATE PESSIMISM:</span> Hoard and fortify. Build Resilience. Shocks barely hurt you.</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--ip);">IP — INDETERMINATE PESSIMISM:</span> Insure and comply. Build Bureaucracy. Only 2 actions/year. Survive everything, build nothing.</div>
+    <div style="text-align:left;margin-bottom:10px;"><span style="color:var(--accent);">SCORING:</span> Breakthrough + Wealth + Impact + Durability. Multiple endings per stance.</div>
+    <div style="text-align:left;margin-bottom:16px;"><span style="color:var(--accent);">THE THESIS:</span> Your worldview shapes outcomes through natural mechanisms — not luck. Feel why each stance leads where it does.</div>
     <button class="g-btn" onclick="sfx('back');showScreen('title-screen')">BACK</button>
   </div>
 </div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  NOT A LOTTERY TICKET: 8-BIT FUTURES — Full Arcade Engine
+//  NOT A LOTTERY TICKET: 8-BIT FUTURES v3
+//  Now with irony, absurdity, and a much bigger sound palette
 // ═══════════════════════════════════════════════════════════
 
-// ── AUDIO (Web Audio API bleeps) ──────────────────────────
+// ── AUDIO ENGINE (expanded) ───────────────────────────────
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let actx;
 function ensureAudio() { if (!actx) actx = new AudioCtx(); }
 
+function playNote(type, freq, dur, vol=0.07, delay=0) {
+  ensureAudio();
+  const o = actx.createOscillator();
+  const g = actx.createGain();
+  o.connect(g); g.connect(actx.destination);
+  o.type = type;
+  const t = actx.currentTime + delay;
+  o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.start(t); o.stop(t + dur);
+  return o;
+}
+
+function playArp(type, freqs, noteDur, vol=0.06) {
+  freqs.forEach((f, i) => playNote(type, f, noteDur, vol, i * noteDur * 0.8));
+}
+
 function sfx(type) {
   try {
-    ensureAudio();
-    const o = actx.createOscillator();
-    const g = actx.createGain();
-    o.connect(g); g.connect(actx.destination);
-    const t = actx.currentTime;
     switch(type) {
-      case 'select':
-        o.type='square'; o.frequency.setValueAtTime(440,t); o.frequency.setValueAtTime(660,t+0.06);
-        g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.12);
-        o.start(t); o.stop(t+0.12); break;
-      case 'confirm':
-        o.type='square'; o.frequency.setValueAtTime(523,t); o.frequency.setValueAtTime(784,t+0.08);
-        g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
-        o.start(t); o.stop(t+0.2); break;
-      case 'start':
-        o.type='square';
-        o.frequency.setValueAtTime(262,t); o.frequency.setValueAtTime(330,t+0.1); o.frequency.setValueAtTime(392,t+0.2); o.frequency.setValueAtTime(523,t+0.3);
-        g.gain.setValueAtTime(0.07,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.45);
-        o.start(t); o.stop(t+0.45); break;
-      case 'back':
-        o.type='triangle'; o.frequency.setValueAtTime(330,t); o.frequency.setValueAtTime(220,t+0.08);
-        g.gain.setValueAtTime(0.06,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
-        o.start(t); o.stop(t+0.15); break;
-      case 'shock':
-        o.type='sawtooth'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(50,t+0.4);
-        g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
-        o.start(t); o.stop(t+0.5); break;
-      case 'opportunity':
-        o.type='sine'; o.frequency.setValueAtTime(440,t); o.frequency.setValueAtTime(880,t+0.15);
-        g.gain.setValueAtTime(0.06,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
-        o.start(t); o.stop(t+0.3); break;
-      case 'singular':
-        o.type='sine';
-        o.frequency.setValueAtTime(262,t); o.frequency.setValueAtTime(523,t+0.15); o.frequency.setValueAtTime(784,t+0.3); o.frequency.setValueAtTime(1047,t+0.45);
-        g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.7);
-        o.start(t); o.stop(t+0.7); break;
-      case 'tick':
-        o.type='sine'; o.frequency.setValueAtTime(800,t);
-        g.gain.setValueAtTime(0.03,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04);
-        o.start(t); o.stop(t+0.04); break;
-      case 'endgame':
-        o.type='triangle';
-        o.frequency.setValueAtTime(523,t); o.frequency.setValueAtTime(659,t+0.2); o.frequency.setValueAtTime(784,t+0.4); o.frequency.setValueAtTime(1047,t+0.6);
-        g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+1);
-        o.start(t); o.stop(t+1); break;
+      // POSITIVE
+      case 'select': playArp('square', [440, 660], 0.08); break;
+      case 'confirm': playArp('square', [523, 784], 0.1); break;
+      case 'start': playArp('square', [262, 330, 392, 523], 0.12, 0.07); break;
+      case 'coin': playArp('square', [988, 1319], 0.08, 0.06); break;
+      case 'levelup': playArp('square', [523, 659, 784, 1047], 0.1, 0.06); break;
+      case 'powerup': playArp('triangle', [330, 440, 554, 659], 0.09, 0.07); break;
+      case 'breakthrough': playArp('square', [262, 330, 392, 523, 659, 784, 1047], 0.1, 0.07); break;
+      case 'cha_ching': playArp('square', [1047, 1319, 1568], 0.07, 0.05); break;
+      case 'combo': playArp('square', [440, 554, 659, 880], 0.08, 0.06); break;
+      case 'fanfare': playArp('triangle', [392, 523, 659, 784, 1047], 0.15, 0.06); break;
+      case 'opportunity': playArp('sine', [440, 660, 880], 0.1, 0.06); break;
+      case 'heal': playArp('sine', [330, 440, 523, 659], 0.12, 0.05); break;
+      case 'sparkle': {
+        playNote('sine', 1200, 0.15, 0.04);
+        playNote('sine', 1600, 0.12, 0.03, 0.05);
+        playNote('sine', 2000, 0.1, 0.02, 0.1);
+        break;
+      }
+
+      // NEGATIVE
+      case 'shock': {
+        ensureAudio();
+        const o = actx.createOscillator();
+        const g = actx.createGain();
+        o.connect(g); g.connect(actx.destination);
+        o.type = 'sawtooth';
+        const t = actx.currentTime;
+        o.frequency.setValueAtTime(200, t);
+        o.frequency.exponentialRampToValueAtTime(40, t + 0.5);
+        g.gain.setValueAtTime(0.1, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+        o.start(t); o.stop(t + 0.6);
+        break;
+      }
+      case 'fail': playArp('square', [392, 349, 330, 262], 0.15, 0.06); break;
+      case 'damage': {
+        playNote('sawtooth', 150, 0.2, 0.08);
+        playNote('square', 100, 0.3, 0.06, 0.05);
+        break;
+      }
+      case 'crash': {
+        ensureAudio();
+        const o = actx.createOscillator(); const g = actx.createGain();
+        o.connect(g); g.connect(actx.destination);
+        o.type = 'sawtooth';
+        const t = actx.currentTime;
+        o.frequency.setValueAtTime(400, t);
+        o.frequency.exponentialRampToValueAtTime(30, t+0.8);
+        g.gain.setValueAtTime(0.12, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t+0.9);
+        o.start(t); o.stop(t+0.9);
+        playNote('square', 80, 0.4, 0.05, 0.3);
+        break;
+      }
+      case 'buzzer': playArp('sawtooth', [200, 150], 0.2, 0.07); break;
+      case 'drain': {
+        playNote('triangle', 300, 0.4, 0.06);
+        playNote('triangle', 200, 0.4, 0.05, 0.15);
+        playNote('triangle', 130, 0.4, 0.04, 0.3);
+        break;
+      }
+      case 'alarm': {
+        for (let i = 0; i < 3; i++) {
+          playNote('square', 800, 0.08, 0.05, i * 0.15);
+          playNote('square', 600, 0.08, 0.05, i * 0.15 + 0.08);
+        }
+        break;
+      }
+      case 'sad_trombone': playArp('triangle', [294, 277, 262, 247], 0.25, 0.06); break;
+      case 'whomp': playNote('triangle', 120, 0.5, 0.08); break;
+
+      // NEUTRAL / UI
+      case 'back': playArp('triangle', [330, 220], 0.08, 0.05); break;
+      case 'tick': playNote('sine', 800, 0.04, 0.03); break;
+      case 'shift': playArp('sine', [440, 554, 440], 0.12, 0.04); break;
+      case 'endgame': playArp('triangle', [523, 659, 784, 1047], 0.2, 0.07); break;
+      case 'dramatic': {
+        playNote('triangle', 220, 0.6, 0.06);
+        playNote('sine', 330, 0.5, 0.04, 0.2);
+        playNote('triangle', 440, 0.4, 0.05, 0.4);
+        break;
+      }
+      case 'suspense': {
+        playNote('triangle', 165, 0.8, 0.05);
+        playNote('sine', 175, 0.8, 0.04, 0.02);
+        break;
+      }
     }
   } catch(e) {}
 }
@@ -919,117 +876,68 @@ function sfx(type) {
 const pCanvas = document.getElementById('particles');
 const pCtx = pCanvas.getContext('2d');
 let particles = [];
+function resizeP() { pCanvas.width=window.innerWidth; pCanvas.height=window.innerHeight; }
+resizeP(); window.addEventListener('resize', resizeP);
 
-function resizeParticles() {
-  pCanvas.width = window.innerWidth;
-  pCanvas.height = window.innerHeight;
+function spawnP(x, y, count, color, spread=80) {
+  for (let i=0;i<count;i++) particles.push({
+    x, y, vx:(Math.random()-0.5)*spread*0.1, vy:(Math.random()-0.5)*spread*0.1-2,
+    life:1, decay:0.015+Math.random()*0.02, size:2+Math.random()*3, color
+  });
 }
-resizeParticles();
-window.addEventListener('resize', resizeParticles);
-
-function spawnParticles(x, y, count, color, spread = 80) {
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      x, y,
-      vx: (Math.random() - 0.5) * spread * 0.1,
-      vy: (Math.random() - 0.5) * spread * 0.1 - 2,
-      life: 1,
-      decay: 0.015 + Math.random() * 0.02,
-      size: 2 + Math.random() * 3,
-      color
-    });
-  }
-}
-
-function tickParticles() {
-  pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+function tickP() {
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
   particles = particles.filter(p => p.life > 0);
   particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.05;
-    p.life -= p.decay;
-    pCtx.globalAlpha = p.life;
-    pCtx.fillStyle = p.color;
-    pCtx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life-=p.decay;
+    pCtx.globalAlpha=p.life; pCtx.fillStyle=p.color;
+    pCtx.fillRect(Math.round(p.x),Math.round(p.y),p.size,p.size);
   });
-  pCtx.globalAlpha = 1;
+  pCtx.globalAlpha=1;
 }
 
-// ── FLOATING POPUPS ───────────────────────────────────────
-function floatPopup(x, y, text, color) {
-  const el = document.createElement('div');
-  el.className = 'float-popup';
-  el.textContent = text;
-  el.style.left = x + 'px';
-  el.style.top = y + 'px';
-  el.style.color = color;
+function floatPopup(x,y,text,color) {
+  const el=document.createElement('div');
+  el.className='float-popup'; el.textContent=text;
+  el.style.left=x+'px'; el.style.top=y+'px'; el.style.color=color;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1300);
+  setTimeout(()=>el.remove(),1300);
 }
 
-// ── COMBO BANNER ──────────────────────────────────────────
 function showCombo(text) {
-  const el = document.getElementById('combo-banner');
-  el.textContent = text;
-  el.className = '';
-  void el.offsetWidth;
-  el.className = 'show';
-  setTimeout(() => el.className = '', 1600);
+  const el=document.getElementById('combo-banner');
+  el.textContent=text; el.className=''; void el.offsetWidth; el.className='show';
+  setTimeout(()=>{el.className='';},1600);
 }
 
-// ── SCREEN SHAKE ──────────────────────────────────────────
 function shake() {
-  const root = document.getElementById('game-root');
-  root.classList.remove('shake');
-  void root.offsetWidth;
-  root.classList.add('shake');
-  setTimeout(() => root.classList.remove('shake'), 500);
+  const r=document.getElementById('game-root');
+  r.classList.remove('shake'); void r.offsetWidth; r.classList.add('shake');
+  setTimeout(()=>r.classList.remove('shake'),500);
 }
 
-// ── SCREEN MANAGEMENT ─────────────────────────────────────
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
 // ── GAME STATE ────────────────────────────────────────────
 const G = {
-  mode: 1,
-  players: [],
-  cp: 0,
-  year: 1,
-  maxYears: 12,
-  log: [],
-  worldTension: 50,
-  evtHist: [],
-  timerInterval: null,
-  timerLeft: 0,
-  timerMax: 30,
-  pendingStances: [],
-  pendingEvent: null,
+  mode:1, players:[], cp:0, year:1, maxYears:12,
+  log:[], worldTension:50, evtHist:[], timerInterval:null,
+  timerLeft:0, timerMax:30, pendingStances:[], pendingEvent:null,
 };
 
 function mkPlayer(stance) {
   const p = {
     stance,
-    res: { time:80, money:60, focus:70, rep:50 },
-    caps: { time:100, money:200, focus:100, rep:100 },
-    hid: { conviction:0, optionality:0, resilience:0, bureaucracy:0 },
-    score: { breakthrough:0, wealth:0, impact:0, durability:0 },
-    total: 0,
-    actMax: 3,
-    actUsed: 0,
-    actHist: [],
-    yearHist: [],
-    planChain: 0,
-    divSet: new Set(),
-    insurance: 0,
-    reserve: 0,
-    shipped: 0,
-    protos: 0,
-    undos: [],
-    traits: {},
+    res:{time:80,money:60,focus:70,rep:50},
+    caps:{time:100,money:200,focus:100,rep:100},
+    hid:{conviction:0,optionality:0,resilience:0,bureaucracy:0},
+    score:{breakthrough:0,wealth:0,impact:0,durability:0},
+    total:0, actMax:3, actUsed:0, actHist:[], yearHist:[],
+    planChain:0, divSet:new Set(), insurance:0, reserve:0,
+    shipped:0, protos:0, undos:[], traits:{},
   };
   switch(stance) {
     case 'DO': p.res.focus=80; p.hid.conviction=20; break;
@@ -1040,447 +948,442 @@ function mkPlayer(stance) {
   return p;
 }
 function cp() { return G.players[G.cp]; }
-const SC = { DO:'#00e5ff', IO:'#ff6ec7', DP:'#76ff03', IP:'#ff9100' };
+const SC={DO:'#00e5ff',IO:'#ff6ec7',DP:'#76ff03',IP:'#ff9100'};
 
-// ── ACTIONS ───────────────────────────────────────────────
+// ── ACTIONS (now with Silicon Valley flavor) ──────────────
 const ACTS = [
-  { id:'plan', name:'WRITE THE SECRET PLAN', s:['DO'], cost:{time:15,focus:20}, fx:{conviction:15}, delayed:{breakthrough:8}, desc:'+15 Conviction. Compounding begins.', tag:'PLAN' },
-  { id:'proto', name:'BUILD PROTOTYPE', s:['DO','IO'], cost:{time:20,money:15}, fx:{rep:5}, delayed:{breakthrough:12,wealth:5}, desc:'+5 Rep. Breakthrough potential.', tag:'BUILD' },
-  { id:'hire_s', name:'HIRE SPECIALISTS', s:['DO'], cost:{money:25,time:10}, fx:{focus:15,conviction:8}, delayed:{breakthrough:10}, desc:'+15 Focus, +8 Conviction.', tag:'TEAM' },
-  { id:'ship', name:'SHIP PRODUCT', s:['DO','IO'], cost:{time:25,focus:15,money:10}, fx:{money:20,rep:15}, delayed:{wealth:15,impact:5}, desc:'Revenue + reputation. Big move.', tag:'SHIP' },
-  { id:'double', name:'DOUBLE DOWN', s:['DO'], cost:{money:30,focus:20}, fx:{conviction:25}, delayed:{breakthrough:20}, desc:'All-in on your plan. +25 Conviction.', tag:'FOCUS' },
-  { id:'expand', name:'EXPAND MARKET', s:['DO','IO'], cost:{money:20,time:15,rep:5}, fx:{rep:10}, delayed:{wealth:15,impact:10}, desc:'Go bigger. New markets.', tag:'GROW' },
-  { id:'ab', name:'A/B TEST EVERYTHING', s:['IO'], cost:{time:10,money:10}, fx:{optionality:15}, delayed:{wealth:5}, desc:'+15 Optionality. Data-driven.', tag:'TEST' },
-  { id:'diversify', name:'DIVERSIFY BETS', s:['IO'], cost:{money:20}, fx:{optionality:20}, delayed:{wealth:8,durability:5}, desc:'Spread your portfolio wide.', tag:'SPREAD' },
-  { id:'network', name:'NETWORK AGGRESSIVELY', s:['IO','DO'], cost:{time:15,focus:10}, fx:{rep:15,optionality:10}, delayed:{impact:5}, desc:'Meet everyone. +15 Rep.', tag:'SOCIAL' },
-  { id:'refactor', name:'REFACTOR PROCESS', s:['IO'], cost:{time:15,focus:15}, fx:{focus:10,optionality:8}, delayed:{durability:5}, desc:'Optimize systems. Process > substance.', tag:'PROCESS' },
-  { id:'pivot', name:'PIVOT STRATEGY', s:['IO'], cost:{time:10,focus:10}, fx:{optionality:15,conviction:-20}, delayed:{}, desc:'New direction. -20 Conviction!', tag:'PIVOT' },
-  { id:'hire_g', name:'HIRE GENERALISTS', s:['IO'], cost:{money:15,time:10}, fx:{focus:10,optionality:10}, delayed:{durability:3}, desc:'Flexible team. Jack of all trades.', tag:'TEAM' },
-  { id:'save', name:'SAVE CASH', s:['DP','IP'], cost:{time:5}, fx:{money:15,resilience:10}, delayed:{durability:5}, desc:'Hoard. +15 Money, +10 Resilience.', tag:'SAVE' },
-  { id:'fortify', name:'FORTIFY POSITION', s:['DP'], cost:{money:15,time:15}, fx:{resilience:20,rep:5}, delayed:{durability:10}, desc:'Build walls. +20 Resilience.', tag:'DEFEND' },
-  { id:'ration', name:'RATION RESOURCES', s:['DP'], cost:{focus:10}, fx:{time:10,money:5,resilience:10}, delayed:{durability:5}, desc:'Stretch every unit.', tag:'RATION' },
-  { id:'infra', name:'INVEST IN INFRA', s:['DP','DO'], cost:{money:25,time:20}, fx:{resilience:15}, delayed:{wealth:10,durability:15}, desc:'Slow but durable. Build what lasts.', tag:'INFRA' },
-  { id:'contingency', name:'PLAN CONTINGENCIES', s:['DP'], cost:{time:15,focus:15}, fx:{resilience:15,conviction:5}, delayed:{durability:8}, desc:'Prepare for every downside.', tag:'PLAN' },
-  { id:'cut', name:'CUT COSTS', s:['DP','IP'], cost:{focus:10}, fx:{money:10,rep:-5,resilience:5}, delayed:{durability:3}, desc:'Trim fat. -5 Rep.', tag:'CUT' },
-  { id:'insure', name:'BUY INSURANCE', s:['IP'], cost:{money:15}, fx:{bureaucracy:15,resilience:5}, delayed:{durability:5}, desc:'+15 Bureaucracy. Cover every risk.', tag:'INSURE' },
-  { id:'lobby', name:'LOBBY REGULATORS', s:['IP','DP'], cost:{money:20,time:10}, fx:{bureaucracy:10,rep:5}, delayed:{durability:5}, desc:'Influence the rules.', tag:'LOBBY' },
-  { id:'comply', name:'FULL COMPLIANCE', s:['IP'], cost:{time:15,focus:15}, fx:{bureaucracy:20,rep:5}, delayed:{durability:8}, desc:'Follow every rule. +20 Bureaucracy.', tag:'COMPLY' },
-  { id:'hedge', name:'HEDGE EVERYTHING', s:['IP'], cost:{money:20,focus:10}, fx:{bureaucracy:10,optionality:5}, delayed:{durability:5}, desc:'Cancel risk with counter-bets.', tag:'HEDGE' },
-  { id:'outsource', name:'OUTSOURCE DECISIONS', s:['IP','IO'], cost:{money:10,focus:5}, fx:{bureaucracy:10,focus:5,conviction:-10}, delayed:{}, desc:'Committees decide. -10 Conviction.', tag:'DEFER' },
-  { id:'audit', name:'RUN AN AUDIT', s:['IP','DP'], cost:{time:10,money:10}, fx:{bureaucracy:8,resilience:8,rep:5}, delayed:{durability:5}, desc:'Check everything twice.', tag:'CHECK' },
+  // DO
+  { id:'plan', name:'WRITE THE SECRET PLAN', s:['DO'], cost:{time:15,focus:20}, fx:{conviction:15}, delayed:{breakthrough:8}, desc:'Definite vision on a napkin. +15 Conviction.', tag:'PLAN' },
+  { id:'proto', name:'BUILD PROTOTYPE', s:['DO','IO'], cost:{time:20,money:15}, fx:{rep:5}, delayed:{breakthrough:12,wealth:5}, desc:'Demo day approaches. Ship or die.', tag:'BUILD' },
+  { id:'hire_s', name:'HIRE TRUE BELIEVERS', s:['DO'], cost:{money:25,time:10}, fx:{focus:15,conviction:8}, delayed:{breakthrough:10}, desc:'Cult-like devotion to the mission. +15 Focus.', tag:'TEAM' },
+  { id:'ship', name:'SHIP IT (BUGS AND ALL)', s:['DO','IO'], cost:{time:25,focus:15,money:10}, fx:{money:20,rep:15}, delayed:{wealth:15,impact:5}, desc:'Launch now, apologize later. Revenue!', tag:'SHIP' },
+  { id:'double', name:'DOUBLE DOWN', s:['DO'], cost:{money:30,focus:20}, fx:{conviction:25}, delayed:{breakthrough:20}, desc:'Bet the company. Again. +25 Conviction.', tag:'FOCUS' },
+  { id:'expand', name:'BLITZSCALE', s:['DO','IO'], cost:{money:20,time:15,rep:5}, fx:{rep:10}, delayed:{wealth:15,impact:10}, desc:'Grow first, figure out revenue later.', tag:'GROW' },
+  { id:'garage', name:'BACK TO THE GARAGE', s:['DO'], cost:{time:20,focus:15}, fx:{conviction:12,money:5}, delayed:{breakthrough:15}, desc:'Strip it down. Build what matters.', tag:'FOCUS' },
+
+  // IO
+  { id:'ab', name:'A/B TEST THE LOGO', s:['IO'], cost:{time:10,money:10}, fx:{optionality:15}, delayed:{wealth:5}, desc:'Does blue or green convert better? +15 Optionality.', tag:'TEST' },
+  { id:'diversify', name:'DIVERSIFY THE PORTFOLIO', s:['IO'], cost:{money:20}, fx:{optionality:20}, delayed:{wealth:8,durability:5}, desc:'Never put all eggs in one basket (or app).', tag:'SPREAD' },
+  { id:'network', name:'WORK THE CONFERENCE', s:['IO','DO'], cost:{time:15,focus:10}, fx:{rep:15,optionality:10}, delayed:{impact:5}, desc:'Business cards. So many business cards.', tag:'SOCIAL' },
+  { id:'refactor', name:'REFACTOR EVERYTHING', s:['IO'], cost:{time:15,focus:15}, fx:{focus:10,optionality:8}, delayed:{durability:5}, desc:'Rewrite in Rust. Again. Process > product.', tag:'PROCESS' },
+  { id:'pivot', name:'PIVOT! PIVOT! PIVOT!', s:['IO'], cost:{time:10,focus:10}, fx:{optionality:15,conviction:-20}, delayed:{}, desc:'We\'re a social network now. -20 Conviction!', tag:'PIVOT' },
+  { id:'hire_g', name:'HIRE STANFORD MBAS', s:['IO'], cost:{money:15,time:10}, fx:{focus:10,optionality:10}, delayed:{durability:3}, desc:'Great at process. Unclear on product.', tag:'TEAM' },
+  { id:'growth_hack', name:'GROWTH HACK', s:['IO'], cost:{time:10,money:5,rep:-3}, fx:{optionality:12,money:8}, delayed:{wealth:5}, desc:'Technically legal. Ethically ambiguous.', tag:'HACK' },
+
+  // DP
+  { id:'save', name:'HOARD CASH LIKE A DRAGON', s:['DP','IP'], cost:{time:5}, fx:{money:15,resilience:10}, delayed:{durability:5}, desc:'Smaug had the right idea. +15 Money.', tag:'SAVE' },
+  { id:'fortify', name:'FORTIFY THE BUNKER', s:['DP'], cost:{money:15,time:15}, fx:{resilience:20,rep:5}, delayed:{durability:10}, desc:'Triple redundancy. Faraday cages. +20 Resilience.', tag:'DEFEND' },
+  { id:'ration', name:'RATION EVERYTHING', s:['DP'], cost:{focus:10}, fx:{time:10,money:5,resilience:10}, delayed:{durability:5}, desc:'One ply. Shared desks. Cold brew is a luxury.', tag:'RATION' },
+  { id:'infra', name:'BUILD INFRASTRUCTURE', s:['DP','DO'], cost:{money:25,time:20}, fx:{resilience:15}, delayed:{wealth:10,durability:15}, desc:'Boring but indestructible. Like concrete.', tag:'INFRA' },
+  { id:'contingency', name:'PLAN FOR DOOMSDAY', s:['DP'], cost:{time:15,focus:15}, fx:{resilience:15,conviction:5}, delayed:{durability:8}, desc:'Asteroid? Covered. AI uprising? Covered.', tag:'PLAN' },
+  { id:'cut', name:'CUT TO THE BONE', s:['DP','IP'], cost:{focus:10}, fx:{money:10,rep:-5,resilience:5}, delayed:{durability:3}, desc:'Fire the chef. Cancel the retreat. -5 Rep.', tag:'CUT' },
+
+  // IP
+  { id:'insure', name:'INSURE AGAINST EXISTENCE', s:['IP'], cost:{money:15}, fx:{bureaucracy:15,resilience:5}, delayed:{durability:5}, desc:'Insure the insurance. +15 Bureaucracy.', tag:'INSURE' },
+  { id:'lobby', name:'LOBBY FOR REGULATIONS', s:['IP','DP'], cost:{money:20,time:10}, fx:{bureaucracy:10,rep:5}, delayed:{durability:5}, desc:'If we can\'t win, nobody can play.', tag:'LOBBY' },
+  { id:'comply', name:'COMPLIANCE OVERDRIVE', s:['IP'], cost:{time:15,focus:15}, fx:{bureaucracy:20,rep:5}, delayed:{durability:8}, desc:'147-page terms of service. +20 Bureaucracy.', tag:'COMPLY' },
+  { id:'hedge', name:'HEDGE THE HEDGE', s:['IP'], cost:{money:20,focus:10}, fx:{bureaucracy:10,optionality:5}, delayed:{durability:5}, desc:'Your derivative has a derivative.', tag:'HEDGE' },
+  { id:'outsource', name:'FORM A COMMITTEE', s:['IP','IO'], cost:{money:10,focus:5}, fx:{bureaucracy:10,focus:5,conviction:-10}, delayed:{}, desc:'18 people. No decisions. -10 Conviction.', tag:'DEFER' },
+  { id:'audit', name:'AUDIT THE AUDITORS', s:['IP','DP'], cost:{time:10,money:10}, fx:{bureaucracy:8,resilience:8,rep:5}, delayed:{durability:5}, desc:'Quis custodiet ipsos custodes?', tag:'CHECK' },
+  { id:'nda', name:'NDA EVERYTHING', s:['IP'], cost:{time:5,money:5}, fx:{bureaucracy:12}, delayed:{durability:3}, desc:'Can\'t get sued if nobody knows what you do.', tag:'LEGAL' },
 ];
 
-// ── EVENTS ────────────────────────────────────────────────
+// ── EVENTS (Silicon Valley absurdism meets real life) ─────
 const EVTS = [
-  { id:'recession', name:'RECESSION HITS', t:'shock', desc:'Markets crash. Capital evaporates overnight.', fx:{money:-20,rep:-5}, w:{DO:0.8,IO:0.9,DP:0.5,IP:0.7} },
-  { id:'competitor', name:'RIVAL EMERGES', t:'shock', desc:'A well-funded competitor appears from nowhere.', fx:{rep:-10,money:-10}, w:{DO:1,IO:0.8,DP:0.6,IP:0.5} },
-  { id:'regulation', name:'NEW REGULATIONS', t:'shock', desc:'Government cracks down. Compliance costs spike.', fx:{money:-15,time:-10,focus:-10}, w:{DO:1,IO:0.9,DP:0.7,IP:0.3} },
-  { id:'talent_drain', name:'TALENT EXODUS', t:'shock', desc:'Your best people leave for greener pastures.', fx:{focus:-15,rep:-5}, w:{DO:0.7,IO:0.9,DP:0.8,IP:1} },
-  { id:'obsolete', name:'TECH OBSOLESCENCE', t:'shock', desc:'Your core tech is suddenly yesterday\'s news.', fx:{focus:-10,conviction:-15,money:-10}, w:{DO:1,IO:0.5,DP:0.6,IP:0.4} },
-  { id:'scandal', name:'PUBLIC SCANDAL', t:'shock', desc:'Bad press. Trust collapses overnight.', fx:{rep:-25,money:-5}, w:{DO:0.8,IO:0.7,DP:0.5,IP:0.6}, req:p=>p.res.rep>40 },
-  { id:'supply', name:'SUPPLY CRISIS', t:'shock', desc:'Critical components unavailable. Everything stalls.', fx:{money:-15,time:-15}, w:{DO:0.9,IO:0.7,DP:0.4,IP:0.6} },
-  { id:'crash', name:'MARKET FREEFALL', t:'shock', desc:'Everything drops. Panic everywhere.', fx:{money:-25,resilience:-5}, w:{DO:0.8,IO:1,DP:0.5,IP:0.6} },
-  { id:'lawsuit', name:'FRIVOLOUS LAWSUIT', t:'shock', desc:'Legal headaches consume all bandwidth.', fx:{money:-15,focus:-15,time:-10}, w:{DO:0.7,IO:0.8,DP:0.6,IP:0.3} },
-  { id:'departure', name:'KEY PERSON LEAVES', t:'shock', desc:'Your most important ally walks away.', fx:{focus:-10,conviction:-10,rep:-5}, w:{DO:1,IO:0.5,DP:0.7,IP:0.4} },
-  { id:'new_tech', name:'BREAKTHROUGH TECH', t:'opportunity', desc:'New technology appears. First-movers win big.', fx:{focus:10,money:10,breakthrough:5}, w:{DO:1.2,IO:0.8,DP:0.5,IP:0.3} },
-  { id:'partner', name:'STRATEGIC PARTNER', t:'opportunity', desc:'A powerful ally offers collaboration.', fx:{money:15,rep:15}, w:{DO:1,IO:1,DP:0.6,IP:0.4} },
-  { id:'talent', name:'TALENT WAVE', t:'opportunity', desc:'Brilliant people are available and eager.', fx:{focus:15,rep:5}, w:{DO:1,IO:0.9,DP:0.6,IP:0.5} },
-  { id:'boom', name:'MARKET BOOM', t:'opportunity', desc:'Demand surges. Money flows freely.', fx:{money:25,rep:5,wealth:5}, w:{DO:1,IO:1,DP:0.5,IP:0.4} },
-  { id:'grant', name:'MAJOR GRANT', t:'opportunity', desc:'Free capital. No strings attached.', fx:{money:20}, w:{DO:0.8,IO:0.7,DP:0.8,IP:0.9} },
-  { id:'viral', name:'VIRAL MOMENT', t:'opportunity', desc:'Unexpected attention. The world is watching.', fx:{rep:20,money:5}, w:{DO:0.9,IO:1,DP:0.4,IP:0.3}, req:p=>p.shipped>0 },
-  { id:'govt_contract', name:'GOV CONTRACT', t:'opportunity', desc:'Stable revenue. Bureaucracy required.', fx:{money:20,bureaucracy:10,durability:5}, w:{DO:0.5,IO:0.6,DP:1,IP:1.2} },
-  { id:'mentor', name:'LEGENDARY MENTOR', t:'opportunity', desc:'A visionary offers guidance.', fx:{conviction:15,focus:10,breakthrough:3}, w:{DO:1.2,IO:0.7,DP:0.5,IP:0.3} },
-  { id:'buyout', name:'ACQUISITION OFFER', t:'opportunity', desc:'Big payout. But you lose control.', fx:{money:40,wealth:20,conviction:-20}, w:{DO:0.7,IO:1.2,DP:0.5,IP:0.8}, req:p=>p.res.rep>30 },
-  { id:'cheap', name:'COSTS PLUMMET', t:'opportunity', desc:'Key inputs become dirt cheap.', fx:{money:15,time:5}, w:{DO:0.8,IO:0.8,DP:1,IP:0.8} },
-  { id:'dereg', name:'DEREGULATION', t:'shift', desc:'Rules relax. Builders and movers rejoice.', fx:{money:5,conviction:5,bureaucracy:-10}, w:{DO:1.2,IO:1,DP:0.6,IP:0.4} },
-  { id:'culture', name:'CULTURE SHIFT', t:'shift', desc:'Public values change overnight.', fx:{rep:-5,optionality:10}, w:{DO:0.7,IO:1.2,DP:0.5,IP:0.6} },
-  { id:'austerity', name:'AUSTERITY ERA', t:'shift', desc:'Everyone tightens belts. Frugality rewarded.', fx:{money:-10,resilience:10}, w:{DO:0.6,IO:0.7,DP:1.2,IP:1} },
-  { id:'global', name:'GLOBALIZATION SURGE', t:'shift', desc:'Borders open. New markets, new threats.', fx:{money:5,rep:5,focus:-5}, w:{DO:1,IO:1.1,DP:0.6,IP:0.5} },
-  { id:'techlash', name:'TECH BACKLASH', t:'shift', desc:'Public turns against innovation.', fx:{rep:-10,bureaucracy:10,conviction:-5}, w:{DO:0.9,IO:0.8,DP:0.7,IP:1.2} },
-  { id:'infra_boom', name:'INFRA BOOM', t:'shift', desc:'Government invests big. Builders benefit.', fx:{money:10,resilience:10}, w:{DO:0.9,IO:0.7,DP:1.2,IP:0.8} },
-  { id:'risk_up', name:'RISK APPETITE RISES', t:'shift', desc:'Investors get bold. Moonshots funded.', fx:{money:10,conviction:5,optionality:5}, w:{DO:1.2,IO:1,DP:0.4,IP:0.3} },
-  { id:'comply_era', name:'COMPLIANCE ERA', t:'shift', desc:'Audits everywhere. Process wins the day.', fx:{bureaucracy:15,focus:-5}, w:{DO:0.5,IO:0.6,DP:0.8,IP:1.3} },
-  { id:'trust', name:'TRUST RENAISSANCE', t:'shift', desc:'Society becomes more cooperative.', fx:{rep:10,focus:5}, w:{DO:1,IO:1,DP:0.8,IP:0.7} },
-  { id:'inequality', name:'INEQUALITY CRISIS', t:'shift', desc:'Public demands change. Impact matters.', fx:{rep:-5,impact:5}, w:{DO:0.8,IO:0.7,DP:0.9,IP:0.8} },
-  { id:'zero_one', name:'0 → 1 BREAKTHROUGH!', t:'singular', desc:'A true original creation. The world will never be the same.', fx:{breakthrough:50,money:30,rep:30,wealth:30,impact:20}, w:{DO:2.5,IO:0.3,DP:0.1,IP:0.05}, req:p=>p.hid.conviction>=40 },
-  { id:'monopoly', name:'NATURAL MONOPOLY', t:'singular', desc:'You capture a market completely.', fx:{wealth:40,money:40,rep:10,durability:20}, w:{DO:1.5,IO:0.4,DP:0.5,IP:0.1}, req:p=>p.shipped>=2 },
-  { id:'perfect_storm', name:'PERFECT STORM', t:'singular', desc:'Everything goes wrong at once. Only the prepared survive.', fx:{money:-40,rep:-20,focus:-20,time:-20}, w:{DO:0.8,IO:0.8,DP:0.3,IP:0.4} },
-  { id:'paradigm', name:'PARADIGM SHIFT', t:'singular', desc:'Reality changes. Adaptable players thrive.', fx:{optionality:20,conviction:-15,money:10}, w:{DO:0.5,IO:1.5,DP:0.4,IP:0.3} },
-  { id:'unicorn', name:'UNICORN MOMENT', t:'singular', desc:'Exponential growth. Everything compounds.', fx:{money:50,wealth:30,rep:20,breakthrough:15}, w:{DO:2,IO:0.7,DP:0.1,IP:0.05}, req:p=>p.planChain>=4 },
-  { id:'institution', name:'INSTITUTION BORN', t:'singular', desc:'Your creation transcends you. It will outlast everything.', fx:{durability:50,impact:30,rep:20,wealth:15}, w:{DO:1,IO:0.5,DP:1.5,IP:0.2}, req:p=>p.hid.resilience>=40 },
-  { id:'black_swan', name:'BLACK SWAN (GOOD)', t:'singular', desc:'Impossible luck. But was it really luck?', fx:{money:35,rep:15,breakthrough:10}, w:{DO:1,IO:1,DP:0.5,IP:0.5} },
-  { id:'collapse', name:'TOTAL COLLAPSE', t:'singular', desc:'The entire ecosystem implodes.', fx:{money:-50,rep:-30,focus:-15}, w:{DO:0.8,IO:0.9,DP:0.2,IP:0.3}, req:p=>G.year>=6 },
-  { id:'movement', name:'A MOVEMENT IS BORN', t:'singular', desc:'People rally behind your cause.', fx:{impact:40,rep:25,focus:10}, w:{DO:1.2,IO:0.8,DP:0.3,IP:0.1}, req:p=>p.score.impact>=20 },
-  { id:'mega_payoff', name:'PORTFOLIO MEGA-PAYOFF', t:'singular', desc:'One of your many bets pays off spectacularly.', fx:{money:40,wealth:25,optionality:10}, w:{DO:0.2,IO:2,DP:0.3,IP:0.4}, req:p=>p.hid.optionality>=40 },
+  // SHOCKS
+  { id:'recession', name:'RECESSION HITS', t:'shock', desc:'Markets crash. Your runway just became a taxiway.', flavor:'"We\'re not in a recession, it\'s a correction." — Everyone, 2008', fx:{money:-20,rep:-5}, w:{DO:0.8,IO:0.9,DP:0.5,IP:0.7} },
+  { id:'competitor', name:'CLONE ARMY APPEARS', t:'shock', desc:'A well-funded copycat launches. They even copied your font.', flavor:'Turns out being "first to market" just means you did their R&D for free.', fx:{rep:-10,money:-10}, w:{DO:1,IO:0.8,DP:0.6,IP:0.5} },
+  { id:'regulation', name:'CONGRESS DISCOVERS YOUR INDUSTRY', t:'shock', desc:'Senators who can\'t set up email now regulate your AI. Compliance costs spike.', flavor:'"Would the CEO please explain to me how the internet works?" — Actual Senate hearing', fx:{money:-15,time:-10,focus:-10}, w:{DO:1,IO:0.9,DP:0.7,IP:0.3} },
+  { id:'talent_drain', name:'EVERYONE LEAVES FOR A STARTUP', t:'shock', desc:'Your best engineers quit to build a crypto-powered dog-walking app. It gets funded.', flavor:'The dog-walking thing actually works. You hate everything.', fx:{focus:-15,rep:-5}, w:{DO:0.7,IO:0.9,DP:0.8,IP:1} },
+  { id:'obsolete', name:'YOUR TECH IS A PUNCHLINE', t:'shock', desc:'A 19-year-old built your entire product as a weekend side project. It\'s on GitHub.', flavor:'"I was bored on a Sunday." — The 19-year-old', fx:{focus:-10,conviction:-15,money:-10}, w:{DO:1,IO:0.5,DP:0.6,IP:0.4} },
+  { id:'scandal', name:'LEAKED SLACK MESSAGES', t:'shock', desc:'Internal hot takes go viral. Twitter is having a field day. HR is having a meltdown.', flavor:'The screenshot includes an emoji reaction from the CEO.', fx:{rep:-25,money:-5}, w:{DO:0.8,IO:0.7,DP:0.5,IP:0.6}, req:p=>p.res.rep>40 },
+  { id:'supply', name:'THE CLOUD IS DOWN', t:'shock', desc:'Your cloud provider has an outage. Your product is the cloud provider. Customers are confused.', flavor:'Status page says "All Systems Operational" while the building is literally on fire.', fx:{money:-15,time:-15}, w:{DO:0.9,IO:0.7,DP:0.4,IP:0.6} },
+  { id:'crash', name:'BUBBLE POPS', t:'shock', desc:'Turns out "disruption" wasn\'t a business model. VCs discover EBITDA.', flavor:'WeWork was just the beginning.', fx:{money:-25,resilience:-5}, w:{DO:0.8,IO:1,DP:0.5,IP:0.6} },
+  { id:'lawsuit', name:'PATENT TROLL ATTACK', t:'shock', desc:'You\'re being sued for using "a computer to do a thing." The patent is from 1997.', flavor:'Their office is a PO box in East Texas.', fx:{money:-15,focus:-15,time:-10}, w:{DO:0.7,IO:0.8,DP:0.6,IP:0.3} },
+  { id:'departure', name:'CO-FOUNDER BREAKUP', t:'shock', desc:'Creative differences. Also they took the code repo. And the espresso machine.', flavor:'The espresso machine hurts the most.', fx:{focus:-10,conviction:-10,rep:-5}, w:{DO:1,IO:0.5,DP:0.7,IP:0.4} },
+  { id:'hype_death', name:'HYPE CYCLE HANGOVER', t:'shock', desc:'Last year you were "revolutionary." This year? "Didn\'t they already try that?"', flavor:'The Gartner Trough of Disillusionment is real and it has your name on it.', fx:{rep:-15,money:-10}, w:{DO:0.8,IO:0.9,DP:0.4,IP:0.5} },
+  { id:'data_breach', name:'DATA BREACH', t:'shock', desc:'Hackers got in through the smart fish tank in the lobby. Seriously.', flavor:'The fish tank was connected to the network "for temperature monitoring."', fx:{money:-20,rep:-15,focus:-10}, w:{DO:0.7,IO:0.8,DP:0.4,IP:0.5} },
+
+  // OPPORTUNITIES
+  { id:'new_tech', name:'NEW PARADIGM DROPS', t:'opportunity', desc:'A genuinely new technology emerges. First-movers get rich. Second-movers get acqui-hired.', flavor:'It\'s like the internet but for [whatever your thing is].', fx:{focus:10,money:10,breakthrough:5}, w:{DO:1.2,IO:0.8,DP:0.5,IP:0.3} },
+  { id:'partner', name:'BIG CORP WANTS TO PARTNER', t:'opportunity', desc:'A Fortune 500 company wants to "explore synergies." Their legal review takes 9 months.', flavor:'The partnership announcement uses the word "ecosystem" fourteen times.', fx:{money:15,rep:15}, w:{DO:1,IO:1,DP:0.6,IP:0.4} },
+  { id:'talent', name:'ACQUI-HIRE OPPORTUNITY', t:'opportunity', desc:'A failed startup\'s A-team is available. They\'re brilliant, slightly traumatized, and cheap.', flavor:'Their last company "changed the world" of artisanal mayonnaise delivery.', fx:{focus:15,rep:5}, w:{DO:1,IO:0.9,DP:0.6,IP:0.5} },
+  { id:'boom', name:'MONEY PRINTER GO BRRRR', t:'opportunity', desc:'Interest rates hit zero. VCs fund anything with "AI" in the pitch deck.', flavor:'A literal Juicero moment. Somebody will fund a subscription for water.', fx:{money:25,rep:5,wealth:5}, w:{DO:1,IO:1,DP:0.5,IP:0.4} },
+  { id:'grant', name:'FREE GOVERNMENT MONEY', t:'opportunity', desc:'You qualify for a grant. The application is 200 pages but the money is free.', flavor:'Turns out "advancing American competitiveness" means whatever you want it to mean.', fx:{money:20}, w:{DO:0.8,IO:0.7,DP:0.8,IP:0.9} },
+  { id:'viral', name:'YOUR INTERN GOES VIRAL', t:'opportunity', desc:'An intern\'s TikTok about your office becomes a cultural moment. You have 10M views.', flavor:'The TikTok is making fun of you. Somehow this helps.', fx:{rep:20,money:5}, w:{DO:0.9,IO:1,DP:0.4,IP:0.3}, req:p=>p.shipped>0 },
+  { id:'govt_contract', name:'GOVERNMENT CONTRACT', t:'opportunity', desc:'Stable revenue for 5 years. The catch: everything is COBOL-compatible.', flavor:'You will attend meetings about meetings. But the check clears.', fx:{money:20,bureaucracy:10,durability:5}, w:{DO:0.5,IO:0.6,DP:1,IP:1.2} },
+  { id:'mentor', name:'LEGENDARY FOUNDER CALLS', t:'opportunity', desc:'A legendary founder wants to advise you. They made their fortune in the \'90s and it shows.', flavor:'"Have you considered building a portal?" — The mentor, unironically', fx:{conviction:15,focus:10,breakthrough:3}, w:{DO:1.2,IO:0.7,DP:0.5,IP:0.3} },
+  { id:'buyout', name:'ACQUISITION OFFER', t:'opportunity', desc:'Big Tech offers a life-changing sum. Your soul costs extra.', flavor:'They promise "full autonomy." The reorg happens in 6 months.', fx:{money:40,wealth:20,conviction:-20}, w:{DO:0.7,IO:1.2,DP:0.5,IP:0.8}, req:p=>p.res.rep>30 },
+  { id:'cheap', name:'AWS BILL DROPS 90%', t:'opportunity', desc:'Infrastructure costs collapse. Your burn rate becomes survivable.', flavor:'The CFO weeps tears of joy. Real, actual tears.', fx:{money:15,time:5}, w:{DO:0.8,IO:0.8,DP:1,IP:0.8} },
+  { id:'influencer', name:'INFLUENCER DISCOVERS YOU', t:'opportunity', desc:'A mega-influencer casually mentions your product. Servers immediately crash.', flavor:'You don\'t have enough servers. You never had enough servers.', fx:{rep:18,money:12}, w:{DO:0.9,IO:1.1,DP:0.3,IP:0.3}, req:p=>p.shipped>0 },
+  { id:'talent_boom', name:'BIG TECH LAYOFFS', t:'opportunity', desc:'A wave of layoffs floods the market with overqualified engineers. Their salary expectations are... aspirational.', flavor:'They want "startup energy" with "big tech compensation." Good luck.', fx:{focus:12,money:-5,rep:5}, w:{DO:1,IO:0.9,DP:0.7,IP:0.5} },
+
+  // SHIFTS
+  { id:'dereg', name:'DEREGULATION WAVE', t:'shift', desc:'New administration tears up the rulebook. Move fast, break things is back.', flavor:'Compliance officers update their resumes.', fx:{money:5,conviction:5,bureaucracy:-10}, w:{DO:1.2,IO:1,DP:0.6,IP:0.4} },
+  { id:'culture', name:'THE DISCOURSE SHIFTS', t:'shift', desc:'Yesterday\'s innovation is today\'s moral panic. The think pieces are merciless.', flavor:'Op-eds from people who don\'t use your product explain why it\'s destroying society.', fx:{rep:-5,optionality:10}, w:{DO:0.7,IO:1.2,DP:0.5,IP:0.6} },
+  { id:'austerity', name:'AUSTERITY IS COOL NOW', t:'shift', desc:'Suddenly "profitable" is trendy. Bootstrap is the new disruption.', flavor:'VCs pretend they always cared about unit economics.', fx:{money:-10,resilience:10}, w:{DO:0.6,IO:0.7,DP:1.2,IP:1} },
+  { id:'global', name:'GLOBALIZATION 2.0', t:'shift', desc:'New markets open. Your competitor is now also in Indonesia, India, and Brazil.', flavor:'Localization is harder than you thought. Much, much harder.', fx:{money:5,rep:5,focus:-5}, w:{DO:1,IO:1.1,DP:0.6,IP:0.5} },
+  { id:'techlash', name:'TECH BACKLASH', t:'shift', desc:'Public sentiment turns. "Tech bro" is now a slur. Hoodies are out, suits are in.', flavor:'You rebrand as a "purpose-driven impact company." Same product.', fx:{rep:-10,bureaucracy:10,conviction:-5}, w:{DO:0.9,IO:0.8,DP:0.7,IP:1.2} },
+  { id:'infra_boom', name:'INFRASTRUCTURE ERA', t:'shift', desc:'Government builds bridges, broadband, and bureaucracy. Boring companies win.', flavor:'The sexiest company in America makes concrete. We live in strange times.', fx:{money:10,resilience:10}, w:{DO:0.9,IO:0.7,DP:1.2,IP:0.8} },
+  { id:'risk_up', name:'YOLO ECONOMY', t:'shift', desc:'Everyone quits their jobs. "Follow your passion" trends globally. Money chases dreams.', flavor:'Your barista is now a VC-backed founder. His latte art startup has a $5M valuation.', fx:{money:10,conviction:5,optionality:5}, w:{DO:1.2,IO:1,DP:0.4,IP:0.3} },
+  { id:'comply_era', name:'THE COMPLIANCE-INDUSTRIAL COMPLEX', t:'shift', desc:'Audits, certifications, three-letter acronyms. Process consumes everything.', flavor:'You now have more compliance officers than engineers. This is fine.', fx:{bureaucracy:15,focus:-5}, w:{DO:0.5,IO:0.6,DP:0.8,IP:1.3} },
+  { id:'trust', name:'TRUST RENAISSANCE', t:'shift', desc:'Somehow, against all odds, people start trusting institutions again. Briefly.', flavor:'It won\'t last. Enjoy it.', fx:{rep:10,focus:5}, w:{DO:1,IO:1,DP:0.8,IP:0.7} },
+  { id:'inequality', name:'PITCHFORKS AND TAX PROPOSALS', t:'shift', desc:'Inequality discourse hits fever pitch. "Billionaire" becomes a dirty word.', flavor:'Your private jet now has a carbon offset. Problem solved, right?', fx:{rep:-5,impact:5}, w:{DO:0.8,IO:0.7,DP:0.9,IP:0.8} },
+  { id:'ai_hype', name:'AI HYPE REACHES PEAK', t:'shift', desc:'Everything is AI now. Your toaster has AI. Your dog\'s collar has AI. Investors love it.', flavor:'You add "AI" to your product name. Revenue doubles. The product is unchanged.', fx:{money:8,rep:8,conviction:-3}, w:{DO:0.7,IO:1.2,DP:0.5,IP:0.6} },
+  { id:'remote_war', name:'RETURN TO OFFICE WARS', t:'shift', desc:'The great RTO vs remote battle consumes all management bandwidth for 6 months.', flavor:'Productivity studies contradict each other. Everyone cites the one they agree with.', fx:{focus:-8,time:-5,bureaucracy:5}, w:{DO:0.7,IO:0.8,DP:0.6,IP:0.9} },
+
+  // SINGULARS
+  { id:'zero_one', name:'0 → 1 BREAKTHROUGH!', t:'singular', desc:'Against all odds, you created something genuinely new. Not an iteration. Not an improvement. A new thing entirely.', flavor:'"They laughed at us. Then they copied us. Then we won."', fx:{breakthrough:50,money:30,rep:30,wealth:30,impact:20}, w:{DO:2.5,IO:0.3,DP:0.1,IP:0.05}, req:p=>p.hid.conviction>=40 },
+  { id:'monopoly', name:'COMPETITION IS FOR LOSERS', t:'singular', desc:'You\'ve captured a market so completely that competitors give up. Peter Thiel nods approvingly.', flavor:'Antitrust lawyers start circling. But for now? Total dominance.', fx:{wealth:40,money:40,rep:10,durability:20}, w:{DO:1.5,IO:0.4,DP:0.5,IP:0.1}, req:p=>p.shipped>=2 },
+  { id:'perfect_storm', name:'EVERYTHING BREAKS AT ONCE', t:'singular', desc:'Recession + regulation + competitor + scandal + the office literally floods. All in one quarter.', flavor:'Your therapist fires you as a client. "Too stressful," they say.', fx:{money:-40,rep:-20,focus:-20,time:-20}, w:{DO:0.8,IO:0.8,DP:0.3,IP:0.4} },
+  { id:'paradigm', name:'REALITY FORK', t:'singular', desc:'A paradigm shift so dramatic that the entire industry map redraws overnight. Adapt or vanish.', flavor:'The last time this happened, "phone" meant something attached to a wall.', fx:{optionality:20,conviction:-15,money:10}, w:{DO:0.5,IO:1.5,DP:0.4,IP:0.3} },
+  { id:'unicorn', name:'UNICORN ACHIEVED', t:'singular', desc:'Your valuation hits $1B. The champagne is from Costco but the number is real.', flavor:'Your parents finally understand what you do. Kind of. Not really.', fx:{money:50,wealth:30,rep:20,breakthrough:15}, w:{DO:2,IO:0.7,DP:0.1,IP:0.05}, req:p=>p.planChain>=4 },
+  { id:'institution', name:'IT WILL OUTLIVE YOU', t:'singular', desc:'What you built has become an institution. It no longer needs you. That\'s the point.', flavor:'The interns don\'t know who you are. This is the highest form of success.', fx:{durability:50,impact:30,rep:20,wealth:15}, w:{DO:1,IO:0.5,DP:1.5,IP:0.2}, req:p=>p.hid.resilience>=40 },
+  { id:'black_swan', name:'BLACK SWAN (GOOD?)', t:'singular', desc:'An event so improbable that no model predicted it. It helps you enormously.', flavor:'Was it luck? Skill? Position? You\'ll argue about this forever.', fx:{money:35,rep:15,breakthrough:10}, w:{DO:1,IO:1,DP:0.5,IP:0.5} },
+  { id:'collapse', name:'EXTINCTION-LEVEL EVENT', t:'singular', desc:'The entire ecosystem collapses. Startups die. VCs hide. Only cockroaches and fortresses survive.', flavor:'"We\'re not in a bubble" — VCs, six months ago', fx:{money:-50,rep:-30,focus:-15}, w:{DO:0.8,IO:0.9,DP:0.2,IP:0.3}, req:p=>G.year>=6 },
+  { id:'movement', name:'YOU STARTED A MOVEMENT', t:'singular', desc:'It stopped being about your product. People believe in what you represent. They march.', flavor:'You didn\'t plan this. Nobody plans this. That\'s what makes it real.', fx:{impact:40,rep:25,focus:10}, w:{DO:1.2,IO:0.8,DP:0.3,IP:0.1}, req:p=>p.score.impact>=20 },
+  { id:'mega_payoff', name:'ONE BET PAYS FOR ALL', t:'singular', desc:'Out of 47 portfolio bets, one returns 1000x. The other 46 were write-offs. Math works.', flavor:'Indeterminate optimism in its purest form. You\'re not a genius. You\'re a statistician.', fx:{money:40,wealth:25,optionality:10}, w:{DO:0.2,IO:2,DP:0.3,IP:0.4}, req:p=>p.hid.optionality>=40 },
+  { id:'pied_piper', name:'THE GARAGE WINS', t:'singular', desc:'Your tiny team with no funding somehow built something that humiliates every giant in the industry.', flavor:'Hooli is furious. Gavin Belson is throwing things. You are in a garage eating cereal.', fx:{breakthrough:35,rep:25,money:15,conviction:15}, w:{DO:2,IO:0.5,DP:0.2,IP:0.05}, req:p=>p.hid.conviction>=30&&p.res.money<60 },
+  { id:'accidental_empire', name:'ACCIDENTAL EMPIRE', t:'singular', desc:'You built a chat app for your team. 200 million people now use it. You still don\'t know why.', flavor:'"We never intended for this to happen." — Every accidental billionaire ever.', fx:{wealth:35,money:30,rep:20,impact:15}, w:{DO:0.4,IO:1.8,DP:0.2,IP:0.3}, req:p=>p.shipped>=1&&p.hid.optionality>=25 },
 ];
 
 // ── ENDINGS ───────────────────────────────────────────────
 const ENDS = {
   DO: [
-    { label:'THE VISIONARY', cond:p=>p.score.breakthrough>=50, blurb:'You saw the future and built it with your bare hands. A definite plan, executed with conviction, created something that never existed before. This is 0→1.', c:'var(--do)' },
-    { label:'THE BUILDER', cond:p=>p.score.wealth>=40, blurb:'Your plan wasn\'t perfect, but you stuck with it. The compound interest of conviction paid off. Definite success born of definite thinking.', c:'var(--do)' },
-    { label:'THE IDEALIST', cond:p=>p.score.breakthrough>=15, blurb:'You had the vision but the world wasn\'t ready — or you weren\'t patient enough. Close, but the future slipped away.', c:'var(--do)' },
-    { label:'THE DREAMER', cond:()=>true, blurb:'You bet everything on a specific future that never arrived. Conviction without adaptation becomes delusion. The universe doesn\'t owe you a breakthrough.', c:'var(--do)' },
+    { label:'THE VISIONARY', cond:p=>p.score.breakthrough>=50, blurb:'You saw the future and built it with your bare hands. The secret plan worked. Not because the universe owed you — but because definite plans, executed with conviction, bend probability. You weren\'t a lottery ticket. You were the dealer.', c:'var(--do)' },
+    { label:'THE BUILDER', cond:p=>p.score.wealth>=40, blurb:'Not a 0→1 breakthrough, but a real thing that works. Your plan evolved but never abandoned its core. The compound interest of conviction paid off. The future you imagined? Close enough. Better than drift.', c:'var(--do)' },
+    { label:'THE STUBBORN IDEALIST', cond:p=>p.score.breakthrough>=15, blurb:'The vision was clear. The execution was messy. You got close enough to see the promised land but not close enough to touch it. Was the plan wrong, or was the world not ready? You\'ll wonder forever.', c:'var(--do)' },
+    { label:'THE BEAUTIFUL DREAMER', cond:()=>true, blurb:'You bet everything on a specific future that never arrived. The napkin plan sits in a drawer. Conviction without adaptation becomes delusion. The universe doesn\'t care about your five-year plan. But at least you had one.', c:'var(--do)' },
   ],
   IO: [
-    { label:'THE OPTIMIZER', cond:p=>p.total>=80, blurb:'You tested everything, diversified perfectly, and drifted north-east into prosperity. No breakthrough, but an optimized machine. Is this the best we can do?', c:'var(--io)' },
-    { label:'THE PORTFOLIO', cond:p=>p.score.wealth>=30, blurb:'Solid returns. No moonshots, no catastrophes. A portfolio of small bets, together sufficient. But did it create anything new?', c:'var(--io)' },
-    { label:'THE DRIFTER', cond:p=>p.score.durability>=15, blurb:'Spread wide but thin. Lots of activity, nothing compounded. A/B tests optimized for local maxima while big questions went unasked.', c:'var(--io)' },
-    { label:'THE SPREADSHEET', cond:()=>true, blurb:'Process without substance. Testing without thesis. When everything is an option, nothing is a commitment. The future drifted — and so did you.', c:'var(--io)' },
+    { label:'THE PORTFOLIO KING', cond:p=>p.total>=80, blurb:'You tested everything, diversified perfectly, and optimized your way to prosperity. No singular vision, no moonshot — just relentless process and probability. Is this the best humanity can do? The returns say: maybe.', c:'var(--io)' },
+    { label:'THE OPTIMIZER', cond:p=>p.score.wealth>=30, blurb:'Your diversified approach delivered solid returns. A/B tested your way to the comfortable middle. The process worked — but somewhere in all those spreadsheets, the question "why?" got lost.', c:'var(--io)' },
+    { label:'THE DRIFT', cond:p=>p.score.durability>=15, blurb:'North-east drift achieved. You moved in a vaguely positive direction without ever choosing a specific destination. Lots of activity. Lots of experiments. What did you build? Hard to say exactly.', c:'var(--io)' },
+    { label:'THE PIVOT TO NOWHERE', cond:()=>true, blurb:'Social network. Marketplace. SaaS tool. AI wrapper. You pivoted so many times you forgot what you originally believed. Process without substance. Options without choices. The spreadsheet is immaculate. The results are not.', c:'var(--io)' },
   ],
   DP: [
-    { label:'THE FORTRESS', cond:p=>p.score.durability>=50, blurb:'You saw the darkness and prepared. While others crashed, you endured. Not glamorous — but immortal.', c:'var(--dp)' },
-    { label:'THE SURVIVOR', cond:p=>p.score.durability>=30, blurb:'Rationed, fortified, defended. Growth was slow but losses were slower. Durability is its own victory.', c:'var(--dp)' },
-    { label:'THE BUNKER', cond:p=>p.res.money>=40, blurb:'You survived — but at what cost? Your walls kept danger out but also kept opportunity out.', c:'var(--dp)' },
-    { label:'THE RUIN', cond:()=>true, blurb:'Even the fortress fell. Defensive pessimism without sufficient resources is just slow failure.', c:'var(--dp)' },
+    { label:'THE FORTRESS', cond:p=>p.score.durability>=50, blurb:'While empires crumbled around you, your walls held. Every crisis that destroyed others barely dented your reserves. Not glamorous. Not exciting. But when the dust settles, you\'re the last one standing. There\'s a word for that: winning.', c:'var(--dp)' },
+    { label:'THE SURVIVOR', cond:p=>p.score.durability>=30, blurb:'You prepared for the worst and got something close to it. But your rationing held. Your walls held. Your cold-brew-free, one-ply office held. In a world of fragile things, you were not fragile. That counts.', c:'var(--dp)' },
+    { label:'THE BUNKER DWELLER', cond:p=>p.res.money>=40, blurb:'Safe inside your fortress, you watched the world change through a very small window. Nothing got in — not danger, not opportunity, not sunlight. You survived. Was that the point?', c:'var(--dp)' },
+    { label:'THE RUIN', cond:()=>true, blurb:'Even the fortress fell. You planned for a dark future and got a darker one. The walls weren\'t thick enough. The rations ran out. Pessimism without sufficient resources is just prophecy fulfilled.', c:'var(--dp)' },
   ],
   IP: [
-    { label:'THE INSTITUTION', cond:p=>p.score.durability>=40, blurb:'You insured everything, followed every rule, outlasted everyone. Not through vision but bureaucratic immortality. The paperwork says: you win.', c:'var(--ip)' },
-    { label:'THE BUREAUCRAT', cond:p=>p.hid.bureaucracy>=50, blurb:'Every risk covered. Every form filed. You didn\'t build anything new, but you didn\'t lose anything old.', c:'var(--ip)' },
-    { label:'THE STAGNANT', cond:p=>p.res.money>=20, blurb:'Nothing ventured, nothing gained. Your hedges cancelled your bets. You existed, but did you live?', c:'var(--ip)' },
-    { label:'THE VOID', cond:()=>true, blurb:'You avoided all risk and found the biggest risk: irrelevance. No vision, no plan, no agency.', c:'var(--ip)' },
+    { label:'THE ETERNAL BUREAUCRACY', cond:p=>p.score.durability>=40, blurb:'You outlasted everyone through sheer institutional inertia. Not through vision or courage — through forms filed in triplicate, insurance policies nested like Russian dolls, and meetings about meetings. The paperwork says you won. Who are we to argue?', c:'var(--ip)' },
+    { label:'THE INSURANCE POLICY', cond:p=>p.hid.bureaucracy>=50, blurb:'Every risk covered. Every form filed. Every hedge hedged. You built nothing new, broke nothing old, and existed in a perfect equilibrium of absolute zero. Bureaucratic nirvana achieved.', c:'var(--ip)' },
+    { label:'THE STAGNANT POND', cond:p=>p.res.money>=20, blurb:'Nothing ventured, nothing gained. Your hedges cancelled your bets. Your insurance ate your capital. Your committees produced reports about the need for more reports. You existed. Technically.', c:'var(--ip)' },
+    { label:'THE VOID', cond:()=>true, blurb:'You avoided all risk and found the biggest risk of all: total irrelevance. While you were filing forms, the world moved on without you. No vision, no plan, no agency, no story. Not even a cautionary tale — just a footnote.', c:'var(--ip)' },
   ],
 };
 
 const ACHVS = [
-  { id:'0to1', name:'0→1', desc:'Trigger a breakthrough event', chk:p=>p.score.breakthrough>=50 },
+  { id:'0to1', name:'0→1 CREATOR', desc:'Trigger a breakthrough event', chk:p=>p.score.breakthrough>=50 },
   { id:'fort', name:'FORTRESS', desc:'Resilience over 60', chk:p=>p.hid.resilience>=60 },
-  { id:'portfolio', name:'PORTFOLIO KING', desc:'Optionality over 70', chk:p=>p.hid.optionality>=70 },
-  { id:'paper', name:'PAPER PUSHER', desc:'Bureaucracy over 80', chk:p=>p.hid.bureaucracy>=80 },
+  { id:'portfolio', name:'OPTIONALITY MAX', desc:'Optionality over 70', chk:p=>p.hid.optionality>=70 },
+  { id:'paper', name:'KAFKAESQUE', desc:'Bureaucracy over 80', chk:p=>p.hid.bureaucracy>=80 },
   { id:'believer', name:'TRUE BELIEVER', desc:'6+ plan chain', chk:p=>p.planChain>=6 },
-  { id:'rich', name:'MONEYBAGS', desc:'End with 150+ Money', chk:p=>p.res.money>=150 },
-  { id:'famous', name:'FAMOUS', desc:'Hit 90+ Reputation', chk:p=>p.res.rep>=90 },
+  { id:'rich', name:'SCROOGE MODE', desc:'End with 150+ Money', chk:p=>p.res.money>=150 },
+  { id:'famous', name:'FRONT PAGE', desc:'Hit 90+ Reputation', chk:p=>p.res.rep>=90 },
   { id:'shipper', name:'SERIAL SHIPPER', desc:'Ship 4+ products', chk:p=>p.shipped>=4 },
 ];
 
 // ── SCREEN FLOW ───────────────────────────────────────────
 function go(screen, mode) {
-  if (screen === 'stance') {
-    G.mode = mode;
-    G.pendingStances = [];
-    document.getElementById('stanceTitle').textContent = mode === 2 ? 'PLAYER 1: CHOOSE STANCE' : 'CHOOSE YOUR FUTURE STANCE';
-    document.querySelectorAll('.stance-card').forEach(c => c.classList.remove('sel'));
-    document.getElementById('goBtn').disabled = true;
+  if (screen==='stance') {
+    G.mode=mode; G.pendingStances=[];
+    document.getElementById('stanceTitle').textContent = mode===2?'PLAYER 1: CHOOSE STANCE':'CHOOSE YOUR FUTURE STANCE';
+    document.querySelectorAll('.stance-card').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('goBtn').disabled=true;
     showScreen('stance-screen');
   }
 }
 
-let pickedStance = null;
+let pickedStance=null;
 function pickStance(s) {
-  sfx('select');
-  pickedStance = s;
-  document.querySelectorAll('.stance-card').forEach(c => c.classList.remove('sel'));
+  sfx('select'); pickedStance=s;
+  document.querySelectorAll('.stance-card').forEach(c=>c.classList.remove('sel'));
   document.querySelector(`.stance-card[data-s="${s}"]`).classList.add('sel');
-  document.getElementById('goBtn').disabled = false;
+  document.getElementById('goBtn').disabled=false;
 }
 
 function beginRun() {
   if (!pickedStance) return;
   G.pendingStances.push(pickedStance);
-  if (G.mode === 2 && G.pendingStances.length === 1) {
-    document.getElementById('stanceTitle').textContent = 'PLAYER 2: CHOOSE STANCE';
-    pickedStance = null;
-    document.querySelectorAll('.stance-card').forEach(c => c.classList.remove('sel'));
-    document.getElementById('goBtn').disabled = true;
+  if (G.mode===2 && G.pendingStances.length===1) {
+    document.getElementById('stanceTitle').textContent='PLAYER 2: CHOOSE STANCE';
+    pickedStance=null;
+    document.querySelectorAll('.stance-card').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('goBtn').disabled=true;
     return;
   }
-  G.year = 1; G.cp = 0; G.log = []; G.evtHist = []; G.worldTension = 50;
-  G.players = G.pendingStances.map(s => mkPlayer(s));
-  pickedStance = null;
+  G.year=1;G.cp=0;G.log=[];G.evtHist=[];G.worldTension=50;
+  G.players=G.pendingStances.map(s=>mkPlayer(s));
+  pickedStance=null;
   showScreen('play-screen');
   startYear();
 }
 
-// ── YEAR TIMER ────────────────────────────────────────────
 function startTimer() {
-  G.timerLeft = G.timerMax;
-  const fill = document.getElementById('timerFill');
-  fill.style.width = '100%';
-  fill.classList.remove('low');
+  G.timerLeft=G.timerMax;
+  const fill=document.getElementById('timerFill');
+  fill.style.width='100%'; fill.classList.remove('low');
   clearInterval(G.timerInterval);
-  G.timerInterval = setInterval(() => {
-    G.timerLeft -= 0.1;
-    const pct = Math.max(0, (G.timerLeft / G.timerMax) * 100);
-    fill.style.width = pct + '%';
-    if (pct < 25) fill.classList.add('low');
-    else fill.classList.remove('low');
-    if (G.timerLeft <= 5 && G.timerLeft > 0 && Math.round(G.timerLeft * 10) % 10 === 0) sfx('tick');
-    if (G.timerLeft <= 0) {
-      clearInterval(G.timerInterval);
-      sfx('confirm');
-      endYear();
-    }
-  }, 100);
+  G.timerInterval=setInterval(()=>{
+    G.timerLeft-=0.1;
+    const pct=Math.max(0,(G.timerLeft/G.timerMax)*100);
+    fill.style.width=pct+'%';
+    if(pct<25) fill.classList.add('low'); else fill.classList.remove('low');
+    if(G.timerLeft<=5&&G.timerLeft>0&&Math.round(G.timerLeft*10)%10===0) sfx('tick');
+    if(G.timerLeft<=0) { clearInterval(G.timerInterval); sfx('buzzer'); endYear(); }
+  },100);
 }
 
-// ── YEAR LIFECYCLE ────────────────────────────────────────
 function startYear() {
-  const p = cp();
-  p.actUsed = 0;
-  p.undos = [];
+  const p=cp();
+  p.actUsed=0; p.undos=[];
   regen(p);
   startTimer();
-  renderHUD();
-  renderRes();
-  renderActs();
-  renderLog();
-  renderWorld();
-  document.getElementById('btnEnd').disabled = false;
-  document.getElementById('btnUndo').disabled = true;
-  addLog(`── YEAR ${G.year} ──`, 't-year');
-  if (G.mode === 2) addLog(`Player ${G.cp + 1} (${p.stance}) turn`, 't-year');
+  renderHUD(); renderRes(); renderActs(); renderLog(); renderWorld();
+  document.getElementById('btnEnd').disabled=false;
+  document.getElementById('btnUndo').disabled=true;
+  addLog(`── YEAR ${G.year} ──`,'t-year');
+  if(G.mode===2) addLog(`Player ${G.cp+1} (${p.stance}) turn`,'t-year');
 }
 
 function regen(p) {
-  p.res.time = Math.min(p.caps.time, p.res.time + 15);
-  p.res.focus = Math.min(p.caps.focus, p.res.focus + 10);
-  p.res.money = Math.min(p.caps.money, p.res.money + 5);
-  p.res.rep = Math.max(0, p.res.rep - 2);
-  if (p.stance !== 'DO') p.hid.conviction = Math.max(0, p.hid.conviction - 4);
-  if (p.stance !== 'IO') p.hid.optionality = Math.max(0, p.hid.optionality - 3);
-  if (p.stance !== 'DP') p.hid.resilience = Math.max(0, p.hid.resilience - 2);
-  if (p.stance !== 'IP') p.hid.bureaucracy = Math.max(0, p.hid.bureaucracy - 2);
+  p.res.time=Math.min(p.caps.time,p.res.time+15);
+  p.res.focus=Math.min(p.caps.focus,p.res.focus+10);
+  p.res.money=Math.min(p.caps.money,p.res.money+5);
+  p.res.rep=Math.max(0,p.res.rep-2);
+  if(p.stance!=='DO') p.hid.conviction=Math.max(0,p.hid.conviction-4);
+  if(p.stance!=='IO') p.hid.optionality=Math.max(0,p.hid.optionality-3);
+  if(p.stance!=='DP') p.hid.resilience=Math.max(0,p.hid.resilience-2);
+  if(p.stance!=='IP') p.hid.bureaucracy=Math.max(0,p.hid.bureaucracy-2);
   clampRes(p);
 }
 
 function clampRes(p) {
-  for (const k in p.res) p.res[k] = Math.max(0, Math.min(p.caps[k], Math.round(p.res[k])));
-  for (const k in p.hid) p.hid[k] = Math.max(0, Math.min(100, Math.round(p.hid[k])));
+  for(const k in p.res) p.res[k]=Math.max(0,Math.min(p.caps[k],Math.round(p.res[k])));
+  for(const k in p.hid) p.hid[k]=Math.max(0,Math.min(100,Math.round(p.hid[k])));
 }
 
 function doAction(id) {
-  const p = cp();
-  if (p.actUsed >= p.actMax) return;
-  const act = ACTS.find(a => a.id === id);
-  if (!act) return;
-  for (const [k,v] of Object.entries(act.cost)) if ((p.res[k]||0) < v) return;
+  const p=cp();
+  if(p.actUsed>=p.actMax) return;
+  const act=ACTS.find(a=>a.id===id);
+  if(!act) return;
+  for(const [k,v] of Object.entries(act.cost)) if((p.res[k]||0)<v) return;
 
-  // Undo snapshot
-  p.undos.push(JSON.parse(JSON.stringify({ res:p.res, hid:p.hid, score:p.score, actUsed:p.actUsed, planChain:p.planChain, divSet:[...p.divSet], shipped:p.shipped, protos:p.protos, insurance:p.insurance, reserve:p.reserve })));
+  p.undos.push(JSON.parse(JSON.stringify({res:p.res,hid:p.hid,score:p.score,actUsed:p.actUsed,planChain:p.planChain,divSet:[...p.divSet],shipped:p.shipped,protos:p.protos,insurance:p.insurance,reserve:p.reserve})));
 
-  // Pay
-  for (const [k,v] of Object.entries(act.cost)) p.res[k] -= v;
-
-  // Immediate
-  for (const [k,v] of Object.entries(act.fx)) {
-    if (k in p.res) p.res[k] += v;
-    else if (k in p.hid) p.hid[k] += v;
+  for(const [k,v] of Object.entries(act.cost)) p.res[k]-=v;
+  for(const [k,v] of Object.entries(act.fx)) {
+    if(k in p.res) p.res[k]+=v;
+    else if(k in p.hid) p.hid[k]+=v;
+  }
+  for(const [k,v] of Object.entries(act.delayed||{})) {
+    if(k in p.score) p.score[k]+=v;
   }
 
-  // Delayed/score
-  for (const [k,v] of Object.entries(act.delayed || {})) {
-    if (k in p.score) p.score[k] += v;
-  }
-
-  // Plan chain (DO)
-  if (act.s.includes('DO') && p.stance === 'DO' && act.id !== 'pivot') {
+  // Plan chain
+  if(act.s.includes('DO')&&p.stance==='DO'&&act.id!=='pivot') {
     p.planChain++;
-    if (p.planChain >= 3) {
-      const bonus = Math.floor(p.planChain * 1.5);
-      p.score.breakthrough += bonus;
-      p.hid.conviction = Math.min(100, p.hid.conviction + 3);
-      if (p.planChain === 3) showCombo('PLAN CHAIN ×3!');
-      else if (p.planChain === 5) showCombo('PLAN CHAIN ×5!!');
-      else if (p.planChain >= 7) showCombo('UNSTOPPABLE ×' + p.planChain + '!!!');
+    if(p.planChain>=3) {
+      const bonus=Math.floor(p.planChain*1.5);
+      p.score.breakthrough+=bonus;
+      p.hid.conviction=Math.min(100,p.hid.conviction+3);
+      if(p.planChain===3){showCombo('PLAN CHAIN ×3!');sfx('combo');}
+      else if(p.planChain===5){showCombo('CONVICTION LOCK ×5!!');sfx('powerup');}
+      else if(p.planChain>=7){showCombo('UNSTOPPABLE ×'+p.planChain+'!!!');sfx('breakthrough');}
     }
-  } else if (p.stance === 'DO' && act.id === 'pivot') {
-    p.planChain = 0;
-  }
+  } else if(p.stance==='DO'&&act.id==='pivot'){p.planChain=0;}
 
-  // Diversity (IO)
+  // Diversity
   p.divSet.add(act.tag);
-  if (p.stance === 'IO' && p.divSet.size >= 4) {
-    p.hid.optionality = Math.min(100, p.hid.optionality + 3);
-    if (p.divSet.size === 4) showCombo('DIVERSIFIED ×4!');
-    else if (p.divSet.size === 6) showCombo('MAXIMUM OPTIONALITY!');
+  if(p.stance==='IO'&&p.divSet.size>=4) {
+    p.hid.optionality=Math.min(100,p.hid.optionality+3);
+    if(p.divSet.size===4){showCombo('DIVERSIFIED ×4!');sfx('combo');}
+    else if(p.divSet.size===6){showCombo('MAXIMUM OPTIONALITY!');sfx('powerup');}
   }
 
-  if (act.id === 'ship') p.shipped++;
-  if (act.id === 'proto') p.protos++;
-  if (act.id === 'insure') p.insurance += 10;
-  if (act.id === 'fortify' || act.id === 'save') p.reserve += 10;
+  if(act.id==='ship') p.shipped++;
+  if(act.id==='proto') p.protos++;
+  if(act.id==='insure') p.insurance+=10;
+  if(act.id==='fortify'||act.id==='save') p.reserve+=10;
 
   p.actUsed++;
   p.actHist.push(act.id);
   clampRes(p);
 
-  // VFX
-  sfx('select');
-  const card = document.querySelector(`.act-card[data-id="${id}"]`);
-  if (card) {
-    const r = card.getBoundingClientRect();
-    spawnParticles(r.left + r.width/2, r.top, 12, SC[p.stance]);
-    floatPopup(r.left + r.width/2 - 20, r.top - 10, act.name.split(' ')[0], SC[p.stance]);
+  sfx(act.fx.money>10?'cha_ching':'select');
+  const card=document.querySelector(`.act-card[data-id="${id}"]`);
+  if(card) {
+    const r=card.getBoundingClientRect();
+    spawnP(r.left+r.width/2,r.top,15,SC[p.stance]);
+    floatPopup(r.left+r.width/2-30,r.top-10,act.tag,SC[p.stance]);
   }
 
-  // Score pulse
-  const scoreEl = document.getElementById('hudScore');
-  scoreEl.classList.remove('pulse'); void scoreEl.offsetWidth; scoreEl.classList.add('pulse');
+  const scoreEl=document.getElementById('hudScore');
+  scoreEl.classList.remove('pulse');void scoreEl.offsetWidth;scoreEl.classList.add('pulse');
 
-  addLog(`▶ ${act.name}`, 't-action');
-  renderHUD();
-  renderRes(true);
-  renderActs();
-  renderWorld();
-  document.getElementById('btnUndo').disabled = false;
+  addLog(`▶ ${act.name}`,'t-action');
+  renderHUD();renderRes(true);renderActs();renderWorld();
+  document.getElementById('btnUndo').disabled=false;
 }
 
 function undo() {
-  const p = cp();
-  if (!p.undos.length) return;
-  const s = p.undos.pop();
-  Object.assign(p, { res:s.res, hid:s.hid, score:s.score, actUsed:s.actUsed, planChain:s.planChain, shipped:s.shipped, protos:s.protos, insurance:s.insurance, reserve:s.reserve });
-  p.divSet = new Set(s.divSet);
-  p.actHist.pop();
-  G.log.pop();
-  renderHUD(); renderRes(); renderActs(); renderLog(); renderWorld();
-  document.getElementById('btnUndo').disabled = !p.undos.length;
+  const p=cp();
+  if(!p.undos.length) return;
+  const s=p.undos.pop();
+  Object.assign(p,{res:s.res,hid:s.hid,score:s.score,actUsed:s.actUsed,planChain:s.planChain,shipped:s.shipped,protos:s.protos,insurance:s.insurance,reserve:s.reserve});
+  p.divSet=new Set(s.divSet);
+  p.actHist.pop(); G.log.pop();
+  renderHUD();renderRes();renderActs();renderLog();renderWorld();
+  document.getElementById('btnUndo').disabled=!p.undos.length;
 }
 
 function endYear() {
   clearInterval(G.timerInterval);
-  const p = cp();
-  p.yearHist.push({ y:G.year, money:p.res.money, rep:p.res.rep, conv:p.hid.conviction, opt:p.hid.optionality, res:p.hid.resilience, bur:p.hid.bureaucracy, score:{...p.score} });
-
-  if (G.mode === 2 && G.cp === 0) {
-    G.cp = 1;
-    startYear();
-    return;
-  }
-
-  document.getElementById('btnEnd').disabled = true;
-  setTimeout(() => generateEvent(), 300);
+  const p=cp();
+  p.yearHist.push({y:G.year,money:p.res.money,rep:p.res.rep,conv:p.hid.conviction,opt:p.hid.optionality,res:p.hid.resilience,bur:p.hid.bureaucracy,score:{...p.score}});
+  if(G.mode===2&&G.cp===0){G.cp=1;startYear();return;}
+  document.getElementById('btnEnd').disabled=true;
+  setTimeout(()=>generateEvent(),300);
 }
 
 // ── EVENT ENGINE ──────────────────────────────────────────
 function generateEvent() {
-  const p = cp();
-  const yf = G.year / G.maxYears;
-  let sc = 0.25 + yf * 0.15, oc = 0.30 - yf * 0.05, hc = 0.25, gc = 0.05 + yf * 0.08;
-  if (p.hid.resilience > 40) sc *= 0.7;
-  if (p.hid.bureaucracy > 40) sc *= 0.8;
-  if (p.hid.conviction > 50) gc *= 1.3;
-  if (p.hid.optionality > 50) oc *= 1.2;
-  const tot = sc+oc+hc+gc;
-  sc/=tot; oc/=tot; hc/=tot; gc/=tot;
-  const roll = Math.random();
-  let type = roll<sc?'shock':roll<sc+oc?'opportunity':roll<sc+oc+hc?'shift':'singular';
-  let cands = EVTS.filter(e => e.t===type && (!e.req||e.req(p)) && !G.evtHist.slice(-3).includes(e.id));
-  if (!cands.length) cands = EVTS.filter(e => e.t==='shift' && !G.evtHist.slice(-3).includes(e.id));
-  if (!cands.length) cands = EVTS.filter(e => e.t==='shift');
-  const wt = cands.map(e => ({ e, w: (e.w[p.stance]||0.5) + Math.random()*0.3 }));
-  wt.sort((a,b) => b.w - a.w);
-  const evt = wt[0].e;
+  const p=cp();
+  const yf=G.year/G.maxYears;
+  let sc=0.25+yf*0.15, oc=0.30-yf*0.05, hc=0.25, gc=0.05+yf*0.08;
+  if(p.hid.resilience>40) sc*=0.7;
+  if(p.hid.bureaucracy>40) sc*=0.8;
+  if(p.hid.conviction>50) gc*=1.3;
+  if(p.hid.optionality>50) oc*=1.2;
+  const tot=sc+oc+hc+gc;
+  sc/=tot;oc/=tot;hc/=tot;gc/=tot;
+  const roll=Math.random();
+  let type=roll<sc?'shock':roll<sc+oc?'opportunity':roll<sc+oc+hc?'shift':'singular';
+  let cands=EVTS.filter(e=>e.t===type&&(!e.req||e.req(p))&&!G.evtHist.slice(-3).includes(e.id));
+  if(!cands.length) cands=EVTS.filter(e=>e.t==='shift'&&!G.evtHist.slice(-3).includes(e.id));
+  if(!cands.length) cands=EVTS.filter(e=>e.t==='shift');
+  const wt=cands.map(e=>({e,w:(e.w[p.stance]||0.5)+Math.random()*0.3}));
+  wt.sort((a,b)=>b.w-a.w);
+  const evt=wt[0].e;
   G.evtHist.push(evt.id);
 
-  // Compute modified effects
-  const afx = { ...evt.fx };
-  if (evt.t === 'shock') {
-    const iProt = Math.min(0.5, p.insurance / 100);
-    const rProt = Math.min(0.4, p.hid.resilience / 200);
-    const prot = 1 - Math.max(iProt, rProt);
-    for (const k in afx) if (afx[k] < 0) afx[k] = Math.round(afx[k] * prot);
+  const afx={...evt.fx};
+  if(evt.t==='shock') {
+    const iProt=Math.min(0.5,p.insurance/100);
+    const rProt=Math.min(0.4,p.hid.resilience/200);
+    const prot=1-Math.max(iProt,rProt);
+    for(const k in afx) if(afx[k]<0) afx[k]=Math.round(afx[k]*prot);
   }
 
-  G.pendingEvent = { evt, afx };
-  showEventPopup(evt, afx);
+  G.pendingEvent={evt,afx};
+  showEventPopup(evt,afx);
 }
 
 function showEventPopup(evt, afx) {
-  const colors = { shock:'var(--danger)', opportunity:'var(--success)', shift:'var(--io)', singular:'var(--accent)' };
-  document.getElementById('evtType').textContent = evt.t.toUpperCase() + ' EVENT';
-  document.getElementById('evtType').style.color = colors[evt.t];
-  document.getElementById('evtName').textContent = evt.name;
+  const colors={shock:'var(--danger)',opportunity:'var(--success)',shift:'var(--io)',singular:'var(--accent)'};
+  document.getElementById('evtType').textContent=evt.t.toUpperCase()+' EVENT';
+  document.getElementById('evtType').style.color=colors[evt.t];
+  document.getElementById('evtName').textContent=evt.name;
 
-  // Typewriter effect for desc
-  const descEl = document.getElementById('evtDesc');
-  descEl.textContent = '';
-  let di = 0;
-  const typewriter = setInterval(() => {
-    if (di < evt.desc.length) {
-      descEl.textContent += evt.desc[di];
-      di++;
-    } else clearInterval(typewriter);
-  }, 25);
+  // Typewriter
+  const descEl=document.getElementById('evtDesc');
+  descEl.textContent='';
+  let di=0;
+  const tw=setInterval(()=>{
+    if(di<evt.desc.length){descEl.textContent+=evt.desc[di];di++;}else clearInterval(tw);
+  },20);
 
-  let fxHTML = '';
-  for (const [k,v] of Object.entries(afx)) {
-    const sign = v>=0?'+':'';
-    const cls = v>=0?'fx-pos':'fx-neg';
-    const label = {time:'Time',money:'Money',focus:'Focus',rep:'Rep',conviction:'Conv',optionality:'Opt',resilience:'Res',bureaucracy:'Bur',breakthrough:'Break',wealth:'Wealth',impact:'Impact',durability:'Dur'}[k]||k;
-    fxHTML += `<span class="${cls}">${sign}${v} ${label}</span>  `;
+  // Flavor text
+  const flavorEl=document.getElementById('evtFlavor');
+  flavorEl.textContent=evt.flavor||'';
+
+  let fxHTML='';
+  for(const [k,v] of Object.entries(afx)) {
+    const sign=v>=0?'+':'';
+    const cls=v>=0?'fx-pos':'fx-neg';
+    const label={time:'Time',money:'Money',focus:'Focus',rep:'Rep',conviction:'Conv',optionality:'Opt',resilience:'Res',bureaucracy:'Bur',breakthrough:'Break',wealth:'Wealth',impact:'Impact',durability:'Dur'}[k]||k;
+    fxHTML+=`<span class="${cls}">${sign}${v} ${label}</span>  `;
   }
-  document.getElementById('evtFx').innerHTML = fxHTML;
+  document.getElementById('evtFx').innerHTML=fxHTML;
 
-  const overlay = document.getElementById('event-overlay');
-  overlay.classList.add('show');
+  document.getElementById('event-overlay').classList.add('show');
 
-  // SFX + VFX
-  sfx(evt.t === 'singular' ? 'singular' : evt.t === 'shock' ? 'shock' : 'opportunity');
-  if (evt.t === 'shock') shake();
-  if (evt.t === 'singular') {
-    spawnParticles(window.innerWidth/2, window.innerHeight/2, 60, '#ffcc00', 200);
-    spawnParticles(window.innerWidth/2, window.innerHeight/2, 40, '#fff', 150);
+  // Sound + VFX
+  if(evt.t==='singular') {
+    const hasGood = Object.values(afx).some(v=>v>15);
+    sfx(hasGood?'breakthrough':'crash');
+    spawnP(window.innerWidth/2,window.innerHeight/2,60,'#ffcc00',200);
+    spawnP(window.innerWidth/2,window.innerHeight/2,40,'#fff',150);
+    if(!hasGood) shake();
+  } else if(evt.t==='shock') {
+    // Pick from negative sounds
+    const shockSounds=['shock','damage','crash','alarm','sad_trombone','whomp','drain'];
+    sfx(shockSounds[Math.floor(Math.random()*shockSounds.length)]);
+    shake();
+    spawnP(window.innerWidth/2,window.innerHeight/2,30,'#ff1744',120);
+  } else if(evt.t==='opportunity') {
+    const oppSounds=['opportunity','cha_ching','heal','sparkle','levelup','powerup'];
+    sfx(oppSounds[Math.floor(Math.random()*oppSounds.length)]);
+    spawnP(window.innerWidth/2,window.innerHeight/2,25,'#00e676',100);
+  } else {
+    sfx('shift');
+    spawnP(window.innerWidth/2,window.innerHeight/2,15,'#ff6ec7',80);
   }
-  if (evt.t === 'shock') spawnParticles(window.innerWidth/2, window.innerHeight/2, 30, '#ff1744', 120);
-  if (evt.t === 'opportunity') spawnParticles(window.innerWidth/2, window.innerHeight/2, 25, '#00e676', 100);
 }
 
 function resolveEvent() {
-  const { evt, afx } = G.pendingEvent;
-  const targets = G.mode === 2 ? G.players : [cp()];
-  targets.forEach(p => {
-    for (const [k,v] of Object.entries(afx)) {
-      if (k in p.res) p.res[k] += v;
-      else if (k in p.hid) p.hid[k] += v;
-      else if (k in p.score) p.score[k] += v;
+  const {evt,afx}=G.pendingEvent;
+  const targets=G.mode===2?G.players:[cp()];
+  targets.forEach(p=>{
+    for(const [k,v] of Object.entries(afx)) {
+      if(k in p.res) p.res[k]+=v;
+      else if(k in p.hid) p.hid[k]+=v;
+      else if(k in p.score) p.score[k]+=v;
     }
     clampRes(p);
   });
-  if (evt.t==='shock') G.worldTension = Math.min(100, G.worldTension+8);
-  else if (evt.t==='opportunity') G.worldTension = Math.max(0, G.worldTension-5);
-  addLog(`${evt.t.toUpperCase()}: ${evt.name}`, 't-' + (evt.t==='opportunity'?'opp':evt.t));
+  if(evt.t==='shock') G.worldTension=Math.min(100,G.worldTension+8);
+  else if(evt.t==='opportunity') G.worldTension=Math.max(0,G.worldTension-5);
+  addLog(`${evt.t.toUpperCase()}: ${evt.name}`,'t-'+(evt.t==='opportunity'?'opp':evt.t));
 
   document.getElementById('event-overlay').classList.remove('show');
 
-  if (G.mode === 2) G.cp = 0;
+  if(G.mode===2) G.cp=0;
   G.year++;
 
-  if (G.year > G.maxYears) {
-    sfx('endgame');
-    setTimeout(endRun, 500);
-  } else {
-    renderWorld();
-    startYear();
-  }
+  if(G.year>G.maxYears){sfx('endgame');setTimeout(endRun,500);}
+  else{renderWorld();startYear();}
 }
 
-// ── END RUN ───────────────────────────────────────────────
 function endRun() {
-  G.players.forEach(p => {
-    p.score.breakthrough += Math.floor(p.hid.conviction / 5);
-    p.score.durability += Math.floor(p.hid.resilience / 4) + Math.floor(p.hid.bureaucracy / 6);
-    p.score.wealth += Math.floor(p.res.money / 5);
-    p.score.impact += Math.floor(p.res.rep / 5);
-    p.total = p.score.breakthrough + p.score.wealth + p.score.impact + p.score.durability;
+  G.players.forEach(p=>{
+    p.score.breakthrough+=Math.floor(p.hid.conviction/5);
+    p.score.durability+=Math.floor(p.hid.resilience/4)+Math.floor(p.hid.bureaucracy/6);
+    p.score.wealth+=Math.floor(p.res.money/5);
+    p.score.impact+=Math.floor(p.res.rep/5);
+    p.total=p.score.breakthrough+p.score.wealth+p.score.impact+p.score.durability;
   });
   renderSummary();
 }
 
 function getEnding(p) {
-  for (const e of ENDS[p.stance]) if (e.cond(p)) return e;
+  for(const e of ENDS[p.stance]) if(e.cond(p)) return e;
   return ENDS[p.stance].slice(-1)[0];
 }
 
 function renderSummary() {
-  const c = document.getElementById('summary-screen');
-  let h = '<div class="sum-title">RUN COMPLETE</div>';
-  G.players.forEach((p, idx) => {
-    const e = getEnding(p);
-    if (G.mode===2) h += `<div style="font-size:9px;color:${SC[p.stance]};text-align:center;margin:10px 0 4px;">PLAYER ${idx+1} — ${p.stance}</div>`;
-    h += `<div class="sum-ending" style="color:${e.c}">${e.label}</div>`;
-    h += `<div class="sum-blurb">${e.blurb}</div>`;
-    h += `<div class="sum-grid">
+  const c=document.getElementById('summary-screen');
+  let h='<div class="sum-title">RUN COMPLETE</div>';
+  G.players.forEach((p,idx)=>{
+    const e=getEnding(p);
+    if(G.mode===2) h+=`<div style="font-size:9px;color:${SC[p.stance]};margin:10px 0 4px;">PLAYER ${idx+1} — ${p.stance}</div>`;
+    h+=`<div class="sum-ending" style="color:${e.c}">${e.label}</div>`;
+    h+=`<div class="sum-blurb">${e.blurb}</div>`;
+    h+=`<div class="sum-grid">
       <div class="sum-stat"><div class="sl">TOTAL</div><div class="sv" style="color:var(--accent)">${p.total}</div></div>
       <div class="sum-stat"><div class="sl">BREAKTHROUGH</div><div class="sv" style="color:var(--do)">${p.score.breakthrough}</div></div>
       <div class="sum-stat"><div class="sl">WEALTH</div><div class="sv" style="color:#ffee58">${p.score.wealth}</div></div>
@@ -1490,326 +1393,260 @@ function renderSummary() {
       <div class="sum-stat"><div class="sl">PLAN CHAIN</div><div class="sv">${p.planChain}</div></div>
       <div class="sum-stat"><div class="sl">PRODUCTS</div><div class="sv">${p.shipped}</div></div>
     </div>`;
-    const achvs = ACHVS.filter(a => a.chk(p));
-    if (achvs.length) {
-      h += '<div class="sum-achv">';
-      achvs.forEach((a,i) => { h += `<div class="achv-item" style="animation-delay:${i*0.15}s">★ ${a.name} — ${a.desc}</div>`; });
-      h += '</div>';
+    const achvs=ACHVS.filter(a=>a.chk(p));
+    if(achvs.length) {
+      h+='<div class="sum-achv">';
+      achvs.forEach((a,i)=>{h+=`<div class="achv-item" style="animation-delay:${i*0.15}s">★ ${a.name} — ${a.desc}</div>`;});
+      h+='</div>';
     }
-    h += `<div class="sum-chart"><canvas id="chart${idx}" width="600" height="140"></canvas></div>`;
+    h+=`<div class="sum-chart"><canvas id="chart${idx}" width="600" height="140"></canvas></div>`;
   });
-  h += `<div style="display:flex;gap:12px;justify-content:center;margin:16px 0;">
+  h+=`<div style="display:flex;gap:12px;justify-content:center;margin:16px 0;">
     <button class="g-btn" onclick="sfx('start');go('stance',${G.mode})">PLAY AGAIN</button>
     <button class="g-btn sec" onclick="sfx('back');showScreen('title-screen')">TITLE</button>
   </div>`;
-  c.innerHTML = h;
+  c.innerHTML=h;
   showScreen('summary-screen');
-  setTimeout(() => G.players.forEach((p,i) => drawChart(`chart${i}`, p)), 200);
+  setTimeout(()=>{
+    sfx('fanfare');
+    G.players.forEach((p,i)=>drawChart(`chart${i}`,p));
+  },200);
 }
 
-function drawChart(id, p) {
-  const cv = document.getElementById(id);
-  if (!cv || !p.yearHist.length) return;
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  ctx.fillStyle = '#0a0a14'; ctx.fillRect(0,0,W,H);
-  // Grid
-  ctx.strokeStyle = '#1a1a2a'; ctx.lineWidth = 1;
-  for (let i=0;i<5;i++) { const y=H*0.1+i*(H*0.75/4); ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(W-10,y); ctx.stroke(); }
-  if (p.yearHist.length < 2) return;
-  const maxM = Math.max(...p.yearHist.map(y=>y.money),1);
-  function line(data, max, color) {
-    ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.beginPath();
-    data.forEach((v,i) => {
-      const x=(i/(data.length-1))*(W-40)+25, y=H-20-(v/max)*(H-40);
+function drawChart(id,p) {
+  const cv=document.getElementById(id);
+  if(!cv||!p.yearHist.length) return;
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.fillStyle='#0a0a14';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#1a1a2a';ctx.lineWidth=1;
+  for(let i=0;i<5;i++){const y=H*0.1+i*(H*0.75/4);ctx.beginPath();ctx.moveTo(20,y);ctx.lineTo(W-10,y);ctx.stroke();}
+  if(p.yearHist.length<2) return;
+  const maxM=Math.max(...p.yearHist.map(y=>y.money),1);
+  function line(data,max,color) {
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x=(i/(data.length-1))*(W-40)+25,y=H-20-(v/max)*(H-40);
       i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-    // Glow
-    ctx.strokeStyle=color; ctx.lineWidth=6; ctx.globalAlpha=0.15;
-    ctx.beginPath();
-    data.forEach((v,i) => {
-      const x=(i/(data.length-1))*(W-40)+25, y=H-20-(v/max)*(H-40);
+    });ctx.stroke();
+    ctx.strokeStyle=color;ctx.lineWidth=6;ctx.globalAlpha=0.15;ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x=(i/(data.length-1))*(W-40)+25,y=H-20-(v/max)*(H-40);
       i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    }); ctx.stroke(); ctx.globalAlpha=1;
+    });ctx.stroke();ctx.globalAlpha=1;
   }
   line(p.yearHist.map(y=>y.money),maxM,'#ffee58');
   line(p.yearHist.map(y=>y.conv),100,'#00e5ff');
   line(p.yearHist.map(y=>y.opt),100,'#ff6ec7');
   line(p.yearHist.map(y=>y.res),100,'#76ff03');
   ctx.font='8px "Press Start 2P"';
-  ctx.fillStyle='#ffee58'; ctx.fillText('$',10,14);
-  ctx.fillStyle='#00e5ff'; ctx.fillText('C',30,14);
-  ctx.fillStyle='#ff6ec7'; ctx.fillText('O',50,14);
-  ctx.fillStyle='#76ff03'; ctx.fillText('R',70,14);
-  ctx.fillStyle='#444'; ctx.font='7px monospace';
-  p.yearHist.forEach((y,i) => { ctx.fillText('Y'+y.y,(i/(p.yearHist.length-1))*(W-40)+20,H-4); });
+  ctx.fillStyle='#ffee58';ctx.fillText('$',10,14);
+  ctx.fillStyle='#00e5ff';ctx.fillText('C',30,14);
+  ctx.fillStyle='#ff6ec7';ctx.fillText('O',50,14);
+  ctx.fillStyle='#76ff03';ctx.fillText('R',70,14);
+  ctx.fillStyle='#444';ctx.font='7px monospace';
+  p.yearHist.forEach((y,i)=>{ctx.fillText('Y'+y.y,(i/(p.yearHist.length-1))*(W-40)+20,H-4);});
 }
 
 // ── RENDERING ─────────────────────────────────────────────
 function renderHUD() {
-  const p = cp();
-  const badge = document.getElementById('hudStance');
-  badge.textContent = p.stance;
-  badge.style.background = SC[p.stance];
-  document.getElementById('hudYear').textContent = `YEAR ${G.year} / ${G.maxYears}`;
-  document.getElementById('hudScore').textContent = p.score.breakthrough+p.score.wealth+p.score.impact+p.score.durability;
-  const pi = document.getElementById('hudPlayer');
-  if (G.mode===2) { pi.style.display='inline'; pi.textContent=`P${G.cp+1}`; pi.style.color=SC[p.stance]; }
+  const p=cp();
+  const badge=document.getElementById('hudStance');
+  badge.textContent=p.stance;badge.style.background=SC[p.stance];
+  document.getElementById('hudYear').textContent=`YEAR ${G.year} / ${G.maxYears}`;
+  document.getElementById('hudScore').textContent=p.score.breakthrough+p.score.wealth+p.score.impact+p.score.durability;
+  const pi=document.getElementById('hudPlayer');
+  if(G.mode===2){pi.style.display='inline';pi.textContent=`P${G.cp+1}`;pi.style.color=SC[p.stance];}
   else pi.style.display='none';
 }
 
-let prevRes = {};
+let prevRes={};
 function renderRes(flash) {
-  const p = cp();
-  const defs = [
+  const p=cp();
+  const defs=[
     {k:'time',icon:'⏱',l:'TIME',c:'#42a5f5'},
     {k:'money',icon:'💰',l:'MONEY',c:'#ffee58'},
     {k:'focus',icon:'🎯',l:'FOCUS',c:'#ce93d8'},
     {k:'rep',icon:'⭐',l:'REP',c:'#ef5350'},
   ];
-  const hvMap = {DO:{k:'conviction',l:'CONVICTION',c:'var(--do)'},IO:{k:'optionality',l:'OPTIONALITY',c:'var(--io)'},DP:{k:'resilience',l:'RESILIENCE',c:'var(--dp)'},IP:{k:'bureaucracy',l:'BUREAUCRACY',c:'var(--ip)'}};
-  let h = '';
-  defs.forEach(d => {
-    const pct = Math.round((p.res[d.k]/p.caps[d.k])*100);
-    const diff = (prevRes[d.k]||0) !== p.res[d.k];
-    const dir = p.res[d.k] > (prevRes[d.k]||0) ? 'up' : p.res[d.k] < (prevRes[d.k]||0) ? 'down' : '';
-    h += `<div class="res-item">
-      <span style="font-size:10px">${d.icon}</span>
-      <span>${d.l}</span>
+  const hvMap={DO:{k:'conviction',l:'CONVICTION',c:'var(--do)'},IO:{k:'optionality',l:'OPTIONALITY',c:'var(--io)'},DP:{k:'resilience',l:'RESILIENCE',c:'var(--dp)'},IP:{k:'bureaucracy',l:'BUREAUCRACY',c:'var(--ip)'}};
+  let h='';
+  defs.forEach(d=>{
+    const pct=Math.round((p.res[d.k]/p.caps[d.k])*100);
+    const diff=(prevRes[d.k]||0)!==p.res[d.k];
+    const dir=p.res[d.k]>(prevRes[d.k]||0)?'up':p.res[d.k]<(prevRes[d.k]||0)?'down':'';
+    h+=`<div class="res-item">
+      <span style="font-size:10px">${d.icon}</span><span>${d.l}</span>
       <div class="res-bar"><div class="res-fill ${flash&&diff?'flash':''}" style="width:${pct}%;background:${d.c}"></div></div>
       <span class="res-val ${flash?dir:''}">${p.res[d.k]}</span>
     </div>`;
   });
-  const hv = hvMap[p.stance];
-  h += `<div class="hv-item"><span>${hv.l}</span><div class="hv-bar"><div class="hv-fill" style="width:${p.hid[hv.k]}%;background:${hv.c}"></div></div><span>${p.hid[hv.k]}</span></div>`;
-  document.getElementById('resRow').innerHTML = h;
-  prevRes = { ...p.res };
-  // Clear flash classes after animation
-  if (flash) setTimeout(() => document.querySelectorAll('.res-val').forEach(el => { el.classList.remove('up','down'); }), 600);
+  const hv=hvMap[p.stance];
+  h+=`<div class="hv-item"><span>${hv.l}</span><div class="hv-bar"><div class="hv-fill" style="width:${p.hid[hv.k]}%;background:${hv.c}"></div></div><span>${p.hid[hv.k]}</span></div>`;
+  document.getElementById('resRow').innerHTML=h;
+  prevRes={...p.res};
+  if(flash) setTimeout(()=>document.querySelectorAll('.res-val').forEach(el=>{el.classList.remove('up','down');}),600);
 }
 
 function renderActs() {
-  const p = cp();
-  const rem = p.actMax - p.actUsed;
-  document.getElementById('actCount').textContent = `ACTIONS: ${rem} / ${p.actMax}`;
-  document.getElementById('actCount').style.color = rem > 0 ? 'var(--accent)' : 'var(--dim)';
-  const avail = ACTS.filter(a => a.s.includes(p.stance));
-  let h = '';
-  avail.forEach(a => {
-    let canAfford = true;
-    for (const [k,v] of Object.entries(a.cost)) if ((p.res[k]||0)<v) { canAfford=false; break; }
-    const off = !canAfford || rem<=0;
-    const costStr = Object.entries(a.cost).map(([k,v])=>`-${v}${k[0].toUpperCase()}`).join(' ');
-    h += `<div class="act-card ${off?'off':''}" data-id="${a.id}" onclick="${off?'':`doAction('${a.id}')`}">
+  const p=cp();
+  const rem=p.actMax-p.actUsed;
+  document.getElementById('actCount').textContent=`ACTIONS: ${rem} / ${p.actMax}`;
+  document.getElementById('actCount').style.color=rem>0?'var(--accent)':'var(--dim)';
+  const avail=ACTS.filter(a=>a.s.includes(p.stance));
+  let h='';
+  avail.forEach(a=>{
+    let canAfford=true;
+    for(const [k,v] of Object.entries(a.cost)) if((p.res[k]||0)<v){canAfford=false;break;}
+    const off=!canAfford||rem<=0;
+    const costStr=Object.entries(a.cost).map(([k,v])=>`-${v}${k[0].toUpperCase()}`).join(' ');
+    h+=`<div class="act-card ${off?'off':''}" data-id="${a.id}" onclick="${off?'':`doAction('${a.id}')`}">
       <div class="act-tag" style="background:${SC[a.s[0]]}">${a.tag}</div>
       <div class="act-name">${a.name}</div>
       <div class="act-cost">${costStr}</div>
       <div class="act-fx">${a.desc}</div>
     </div>`;
   });
-  document.getElementById('actGrid').innerHTML = h;
+  document.getElementById('actGrid').innerHTML=h;
 }
 
-function addLog(text, cls='') {
-  G.log.push({text,cls});
-  renderLog();
+function addLog(text,cls='') {
+  G.log.push({text,cls});renderLog();
 }
 
 function renderLog() {
-  const list = document.getElementById('logList');
-  let h = '';
-  G.log.slice(-25).reverse().forEach(l => {
-    h += `<div class="log-entry ${l.cls}">${l.text}</div>`;
+  const list=document.getElementById('logList');
+  let h='';
+  G.log.slice(-25).reverse().forEach(l=>{
+    h+=`<div class="log-entry ${l.cls}">${l.text}</div>`;
   });
-  list.innerHTML = h;
+  list.innerHTML=h;
 }
 
-// ── WORLD CANVAS (Pixel City!) ────────────────────────────
+// ── WORLD CANVAS ──────────────────────────────────────────
 let worldCtx;
 function renderWorld() {
-  const canvas = document.getElementById('world-canvas');
-  if (!canvas) return;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  canvas.width = Math.floor(rect.width);
-  canvas.height = Math.floor(Math.max(120, rect.height - 260));
-  worldCtx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const p = cp();
+  const canvas=document.getElementById('world-canvas');
+  if(!canvas) return;
+  const rect=canvas.parentElement.getBoundingClientRect();
+  canvas.width=Math.floor(rect.width);
+  canvas.height=Math.floor(Math.max(120,rect.height-260));
+  worldCtx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,p=cp();
 
-  // Sky gradient based on stance + world tension
-  const skyColors = {
-    DO: [`#0a1628`,`#1a3a6a`],
-    IO: [`#1a0a28`,`#3a1a5a`],
-    DP: [`#0a140a`,`#1a3a1a`],
-    IP: [`#1a1408`,`#3a2a10`],
-  };
-  const [skyTop, skyBot] = skyColors[p.stance] || skyColors.DO;
-  const skyGrad = worldCtx.createLinearGradient(0,0,0,H);
-  skyGrad.addColorStop(0, skyTop);
-  skyGrad.addColorStop(1, skyBot);
-  worldCtx.fillStyle = skyGrad;
-  worldCtx.fillRect(0,0,W,H);
+  const skyColors={DO:[`#0a1628`,`#1a3a6a`],IO:[`#1a0a28`,`#3a1a5a`],DP:[`#0a140a`,`#1a3a1a`],IP:[`#1a1408`,`#3a2a10`]};
+  const [skyTop,skyBot]=skyColors[p.stance]||skyColors.DO;
+  const skyGrad=worldCtx.createLinearGradient(0,0,0,H);
+  skyGrad.addColorStop(0,skyTop);skyGrad.addColorStop(1,skyBot);
+  worldCtx.fillStyle=skyGrad;worldCtx.fillRect(0,0,W,H);
 
-  // Stars
-  const starSeed = 42;
-  for (let i=0;i<40;i++) {
-    const sx = ((starSeed*i*137)%W);
-    const sy = ((starSeed*i*73)%(H*0.6));
-    const bright = 0.3 + Math.sin(Date.now()*0.002 + i) * 0.3;
-    worldCtx.globalAlpha = bright;
-    worldCtx.fillStyle = '#fff';
-    worldCtx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
+  for(let i=0;i<40;i++){
+    const sx=((42*i*137)%W),sy=((42*i*73)%(H*0.6));
+    const bright=0.3+Math.sin(Date.now()*0.002+i)*0.3;
+    worldCtx.globalAlpha=bright;worldCtx.fillStyle='#fff';
+    worldCtx.fillRect(Math.floor(sx),Math.floor(sy),1,1);
   }
-  worldCtx.globalAlpha = 1;
+  worldCtx.globalAlpha=1;
 
-  // Ground
-  const groundY = H * 0.75;
-  worldCtx.fillStyle = '#0a0a0a';
-  worldCtx.fillRect(0, groundY, W, H - groundY);
-  worldCtx.fillStyle = '#1a1a2a';
-  worldCtx.fillRect(0, groundY, W, 2);
+  const groundY=H*0.75;
+  worldCtx.fillStyle='#0a0a0a';worldCtx.fillRect(0,groundY,W,H-groundY);
+  worldCtx.fillStyle='#1a1a2a';worldCtx.fillRect(0,groundY,W,2);
 
-  // Buildings based on game state
-  const wealth = p.score.wealth + p.res.money * 0.3;
-  const buildCount = Math.min(20, Math.floor(3 + wealth / 15));
-  const maxBuildH = H * 0.55;
+  const wealth=p.score.wealth+p.res.money*0.3;
+  const buildCount=Math.min(20,Math.floor(3+wealth/15));
+  const maxBuildH=H*0.55;
 
-  for (let i = 0; i < buildCount; i++) {
-    const bx = 15 + i * (W - 30) / buildCount;
-    const seed = (i * 7 + 13) * 37;
-    const bw = 12 + (seed % 20);
-    let bh = 15 + (seed % 30) + (wealth / 8) + (p.score.breakthrough * 1.5);
-    bh = Math.min(maxBuildH, bh);
-
-    // Building color by stance
-    const bColors = { DO:'#1a4a6a', IO:'#4a1a4a', DP:'#1a3a1a', IP:'#3a2a0a' };
-    worldCtx.fillStyle = bColors[p.stance];
-    worldCtx.fillRect(Math.floor(bx), Math.floor(groundY - bh), Math.floor(bw), Math.floor(bh));
-
-    // Windows
-    const winColor = SC[p.stance];
-    for (let wy = groundY - bh + 4; wy < groundY - 4; wy += 8) {
-      for (let wx = bx + 3; wx < bx + bw - 3; wx += 6) {
-        if (Math.random() > 0.4) {
-          worldCtx.globalAlpha = 0.3 + Math.random() * 0.5;
-          worldCtx.fillStyle = winColor;
-          worldCtx.fillRect(Math.floor(wx), Math.floor(wy), 3, 4);
+  for(let i=0;i<buildCount;i++){
+    const bx=15+i*(W-30)/buildCount;
+    const seed=(i*7+13)*37;
+    const bw=12+(seed%20);
+    let bh=15+(seed%30)+(wealth/8)+(p.score.breakthrough*1.5);
+    bh=Math.min(maxBuildH,bh);
+    const bColors={DO:'#1a4a6a',IO:'#4a1a4a',DP:'#1a3a1a',IP:'#3a2a0a'};
+    worldCtx.fillStyle=bColors[p.stance];
+    worldCtx.fillRect(Math.floor(bx),Math.floor(groundY-bh),Math.floor(bw),Math.floor(bh));
+    const winColor=SC[p.stance];
+    for(let wy=groundY-bh+4;wy<groundY-4;wy+=8){
+      for(let wx=bx+3;wx<bx+bw-3;wx+=6){
+        if(Math.random()>0.4){
+          worldCtx.globalAlpha=0.3+Math.random()*0.5;
+          worldCtx.fillStyle=winColor;
+          worldCtx.fillRect(Math.floor(wx),Math.floor(wy),3,4);
         }
       }
     }
-    worldCtx.globalAlpha = 1;
-
-    // Antenna on tall buildings
-    if (bh > maxBuildH * 0.6) {
-      worldCtx.fillStyle = '#444';
-      worldCtx.fillRect(Math.floor(bx + bw/2), Math.floor(groundY - bh - 8), 1, 8);
-      // Blinking light
-      if (Math.sin(Date.now() * 0.003 + i) > 0) {
-        worldCtx.fillStyle = '#ff0000';
-        worldCtx.fillRect(Math.floor(bx + bw/2), Math.floor(groundY - bh - 9), 2, 2);
+    worldCtx.globalAlpha=1;
+    if(bh>maxBuildH*0.6){
+      worldCtx.fillStyle='#444';
+      worldCtx.fillRect(Math.floor(bx+bw/2),Math.floor(groundY-bh-8),1,8);
+      if(Math.sin(Date.now()*0.003+i)>0){
+        worldCtx.fillStyle='#ff0000';
+        worldCtx.fillRect(Math.floor(bx+bw/2),Math.floor(groundY-bh-9),2,2);
       }
     }
   }
 
-  // Conviction beam (DO)
-  if (p.stance === 'DO' && p.hid.conviction > 30) {
-    const beamAlpha = (p.hid.conviction / 100) * 0.3;
-    worldCtx.globalAlpha = beamAlpha;
-    worldCtx.fillStyle = SC.DO;
-    worldCtx.fillRect(W/2 - 2, 0, 4, groundY);
-    worldCtx.globalAlpha = 1;
+  if(p.stance==='DO'&&p.hid.conviction>30){
+    worldCtx.globalAlpha=(p.hid.conviction/100)*0.3;
+    worldCtx.fillStyle=SC.DO;
+    worldCtx.fillRect(W/2-2,0,4,groundY);
+    worldCtx.globalAlpha=1;
   }
 
-  // Network nodes (IO)
-  if (p.stance === 'IO' && p.hid.optionality > 20) {
-    const nodes = Math.floor(p.hid.optionality / 10);
-    worldCtx.strokeStyle = SC.IO;
-    worldCtx.globalAlpha = 0.3;
-    worldCtx.lineWidth = 1;
-    const pts = [];
-    for (let i=0;i<nodes;i++) {
-      const nx = 30 + ((i * 97 + 31) % (W - 60));
-      const ny = 20 + ((i * 53 + 17) % (groundY - 40));
-      pts.push([nx,ny]);
-      worldCtx.fillStyle = SC.IO;
-      worldCtx.fillRect(nx-1, ny-1, 3, 3);
+  if(p.stance==='IO'&&p.hid.optionality>20){
+    const nodes=Math.floor(p.hid.optionality/10);
+    worldCtx.strokeStyle=SC.IO;worldCtx.globalAlpha=0.3;worldCtx.lineWidth=1;
+    const pts=[];
+    for(let i=0;i<nodes;i++){
+      const nx=30+((i*97+31)%(W-60)),ny=20+((i*53+17)%(groundY-40));
+      pts.push([nx,ny]);worldCtx.fillStyle=SC.IO;worldCtx.fillRect(nx-1,ny-1,3,3);
     }
-    for (let i=0;i<pts.length;i++) for (let j=i+1;j<pts.length;j++) {
-      if (Math.abs(pts[i][0]-pts[j][0]) + Math.abs(pts[i][1]-pts[j][1]) < 150) {
-        worldCtx.beginPath(); worldCtx.moveTo(pts[i][0],pts[i][1]); worldCtx.lineTo(pts[j][0],pts[j][1]); worldCtx.stroke();
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      if(Math.abs(pts[i][0]-pts[j][0])+Math.abs(pts[i][1]-pts[j][1])<150){
+        worldCtx.beginPath();worldCtx.moveTo(pts[i][0],pts[i][1]);worldCtx.lineTo(pts[j][0],pts[j][1]);worldCtx.stroke();
       }
     }
-    worldCtx.globalAlpha = 1;
+    worldCtx.globalAlpha=1;
   }
 
-  // Fortress walls (DP)
-  if (p.stance === 'DP' && p.hid.resilience > 15) {
-    const wallH = 5 + p.hid.resilience * 0.3;
-    worldCtx.fillStyle = '#2a4a2a';
-    worldCtx.fillRect(0, groundY - wallH, W, wallH);
-    // Battlements
-    for (let i=0;i<W;i+=12) {
-      worldCtx.fillRect(i, groundY - wallH - 4, 6, 4);
-    }
+  if(p.stance==='DP'&&p.hid.resilience>15){
+    const wallH=5+p.hid.resilience*0.3;
+    worldCtx.fillStyle='#2a4a2a';worldCtx.fillRect(0,groundY-wallH,W,wallH);
+    for(let i=0;i<W;i+=12) worldCtx.fillRect(i,groundY-wallH-4,6,4);
   }
 
-  // Bureaucracy fog (IP)
-  if (p.stance === 'IP' && p.hid.bureaucracy > 20) {
-    const fogAlpha = Math.min(0.4, p.hid.bureaucracy / 200);
-    worldCtx.globalAlpha = fogAlpha;
-    worldCtx.fillStyle = '#4a3a20';
-    worldCtx.fillRect(0, 0, W, H);
-    worldCtx.globalAlpha = 1;
+  if(p.stance==='IP'&&p.hid.bureaucracy>20){
+    worldCtx.globalAlpha=Math.min(0.4,p.hid.bureaucracy/200);
+    worldCtx.fillStyle='#4a3a20';worldCtx.fillRect(0,0,W,H);worldCtx.globalAlpha=1;
   }
 
-  // Shock lightning if world tension high
-  if (G.worldTension > 70 && Math.random() > 0.7) {
-    worldCtx.strokeStyle = '#fff';
-    worldCtx.globalAlpha = 0.6;
-    worldCtx.lineWidth = 2;
+  if(G.worldTension>70&&Math.random()>0.7){
+    worldCtx.strokeStyle='#fff';worldCtx.globalAlpha=0.6;worldCtx.lineWidth=2;
     worldCtx.beginPath();
-    let lx = Math.random() * W, ly = 0;
-    ctx_moveTo(worldCtx, lx, ly);
-    for (let s=0;s<5;s++) {
-      lx += (Math.random()-0.5)*30;
-      ly += 15 + Math.random()*20;
-      worldCtx.lineTo(lx, ly);
-    }
-    worldCtx.stroke();
-    worldCtx.globalAlpha = 1;
+    let lx=Math.random()*W,ly=0;worldCtx.moveTo(lx,ly);
+    for(let s=0;s<5;s++){lx+=(Math.random()-0.5)*30;ly+=15+Math.random()*20;worldCtx.lineTo(lx,ly);}
+    worldCtx.stroke();worldCtx.globalAlpha=1;
   }
 
-  // Year label
-  worldCtx.fillStyle = '#ffffff';
-  worldCtx.globalAlpha = 0.2;
-  worldCtx.font = '40px "Press Start 2P"';
-  worldCtx.fillText('Y' + G.year, W - 110, H - 15);
-  worldCtx.globalAlpha = 1;
+  worldCtx.fillStyle='#ffffff';worldCtx.globalAlpha=0.15;
+  worldCtx.font='40px "Press Start 2P"';worldCtx.fillText('Y'+G.year,W-110,H-15);
+  worldCtx.globalAlpha=1;
 }
-
-function ctx_moveTo(ctx, x, y) { ctx.moveTo(x, y); }
 
 // ── ANIMATION LOOP ────────────────────────────────────────
-function animLoop() {
-  tickParticles();
-  requestAnimationFrame(animLoop);
-}
+function animLoop(){tickP();requestAnimationFrame(animLoop);}
 animLoop();
 
-// ── WINDOW RESIZE ─────────────────────────────────────────
-window.addEventListener('resize', () => {
-  if (document.getElementById('play-screen').classList.contains('active')) renderWorld();
+window.addEventListener('resize',()=>{
+  if(document.getElementById('play-screen').classList.contains('active')) renderWorld();
 });
 
-// ── KEYBOARD ──────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('event-overlay').classList.contains('show')) {
-    sfx('confirm'); resolveEvent();
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('event-overlay').classList.contains('show')){
+    sfx('confirm');resolveEvent();
   }
 });
 
-// ── INIT ──────────────────────────────────────────────────
 showScreen('title-screen');
 </script>
 
