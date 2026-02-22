@@ -1,4 +1,6 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NOT A LOTTERY TICKET: 8-BIT FUTURES</title>
@@ -24,12 +26,15 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  background: var(--bg);
+  background: #000;
   color: var(--text);
   font-family: 'Press Start 2P', monospace;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #crt {
@@ -47,9 +52,16 @@ body {
 }
 
 #game-root {
-  width:100vw; height:100vh;
-  position:relative;
+  width: min(100vw, calc(100vh * 4 / 3));
+  height: min(100vh, calc(100vw * 3 / 4));
+  max-width: 1200px;
+  max-height: 900px;
+  position: relative;
   transition: transform 0.05s;
+  background: var(--bg);
+  border: 2px solid #1a1a3a;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 80px rgba(0,0,0,0.5);
+  overflow: hidden;
 }
 #game-root.shake { animation: shakeAnim 0.4s ease-out; }
 @keyframes shakeAnim {
@@ -298,10 +310,12 @@ body {
 #play-screen { display: none; padding: 8px; }
 #play-screen.active {
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto auto 1fr auto;
   gap: 6px;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
 .hud {
@@ -522,7 +536,7 @@ body {
 #summary-screen {
   padding: 20px;
   width: 100%;
-  max-height: 100vh;
+  max-height: 100%;
   overflow-y: auto;
   align-items: center;
   text-align: center;
@@ -583,7 +597,7 @@ body {
 #glossary-screen {
   padding: 24px;
   width: 100%;
-  max-height: 100vh; overflow-y: auto;
+  max-height: 100%; overflow-y: auto;
   font-size: 7px; line-height: 2.2;
   text-align: center;
 }
@@ -591,20 +605,164 @@ body {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 800px) {
-  .main-area { grid-template-columns: 1fr; grid-template-rows: 1fr auto 160px; }
+  .main-area { grid-template-columns: 1fr; grid-template-rows: 1fr auto auto; }
   .stance-grid { grid-template-columns: 1fr; }
   .sum-grid { grid-template-columns: 1fr 1fr; }
-  .action-grid { max-height: 160px; }
+  .action-grid { max-height: 280px; grid-template-columns: 1fr 1fr; }
+  .act-card { padding: 12px 10px; min-height: 80px; }
+  .act-card .act-name { font-size: 7px; margin-bottom: 5px; }
+  .act-card .act-cost { margin-bottom: 4px; }
+  .act-card .act-fx { line-height: 1.8; }
 }
+
+@media (max-width: 500px) {
+  .action-grid { grid-template-columns: 1fr; max-height: 300px; }
+  .act-card { min-height: 70px; padding: 10px; }
+  .res-row { gap: 6px; padding: 4px 8px; font-size: 6px; }
+  .res-bar { width: 40px; }
+  .hv-bar { width: 35px; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYOUT CONTROL PATCH (NO GAMEPLAY CHANGES)
+   Paste at END of <style> so it overrides earlier rules.
+─────────────────────────────────────────────────────────── */
+
+/* Optional tunables */
+:root{
+  --ui-gap: 6px;
+  --ui-pad: 8px;
+  --actions-min-h: 120px;
+  --actions-max-h: 30%;
+}
+
+/* Use dynamic viewport height where supported */
+body{
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Make the play screen a strict container-managed grid */
+#play-screen.active{
+  height: 100%;
+  width: 100%;
+  padding: var(--ui-pad);
+  gap: var(--ui-gap);
+  min-height: 0;
+  align-items: stretch;
+}
+
+/* Ensure the "1fr" row can actually shrink (grid gotcha) */
+#play-screen.active > *{
+  min-height: 0;
+}
+
+/* Main split area should take remaining space, not force overflow */
+.main-area{
+  min-height: 0;
+  overflow: hidden;
+  gap: var(--ui-gap);
+  align-self: stretch;
+  height: 100%;
+}
+
+/* Left column: allow world + actions to manage height sanely */
+.world-col{
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-gap);
+}
+
+/* World canvas should be the primary flexible grow/shrink element */
+#world-canvas{
+  flex: 1 1 auto;
+  min-height: 120px;
+  height: auto;         /* prevents weird stretching */
+  max-height: none;
+}
+
+/* Action count is fixed-height UI; keep it from stretching */
+.act-count{
+  flex: 0 0 auto;
+}
+
+/* Actions list becomes the controlled scroller in left column */
+.action-grid{
+  flex: 0 1 auto;
+  min-height: var(--actions-min-h);
+  max-height: var(--actions-max-h);
+  overflow: auto;
+  padding: 4px;
+}
+
+/* Right column: log container must be allowed to shrink */
+.log-col{
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Log list is the only scroller on the right */
+.log-list{
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Small screens: keep it stable and prevent "floating apart" */
+@media (max-width: 800px){
+  #play-screen.active{
+    height: 100%;
+  }
+
+  .main-area{
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto minmax(140px, 220px);
+  }
+
+  .action-grid{
+    max-height: 25%;
+  }
+}
+
+
+/* ── BACKGROUND MUSIC (additive) ── */
+#music-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 90;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  background: rgba(10,10,20,0.7);
+  color: var(--text);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+#music-toggle.on {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 18px rgba(255,204,0,0.15), inset 0 0 12px rgba(255,204,0,0.06);
+}
+#music-toggle:focus { outline: 2px dashed var(--accent); outline-offset: 3px; }
+
 </style>
 </head>
 <body>
 
 <div id="crt"></div>
-<canvas id="particles" width="1516" height="429"></canvas>
+<canvas id="particles"></canvas>
 <div id="combo-banner"></div>
 
+
 <div id="game-root">
+  <button id="music-toggle" class="on" type="button" aria-pressed="true" title="Toggle background music">MUSIC: ON</button>
   <!-- ═══ TITLE ═══ -->
   <div id="title-screen" class="screen active">
     <div class="title-coin">🎰</div>
@@ -642,7 +800,7 @@ body {
         <div class="sc-stats">⬆ LOW CEILING  ⬇ HIGH SURVIVAL<br>★ Rewards: insurance, compliance<br>✕ Punishes: vision, boldness</div>
       </div>
     </div>
-    <button class="go-btn" id="goBtn" disabled="" onclick="sfx('start');beginRun()">▶ START RUN</button>
+    <button class="go-btn" id="goBtn" disabled onclick="sfx('start');beginRun()">▶ START RUN</button>
   </div>
 
   <!-- ═══ PLAY ═══ -->
@@ -668,7 +826,7 @@ body {
     </div>
     <div class="bot-bar">
       <button class="g-btn" id="btnEnd" onclick="sfx('confirm');endYear()">END YEAR ▶</button>
-      <button class="g-btn sec" id="btnUndo" onclick="sfx('back');undo()" disabled="">UNDO</button>
+      <button class="g-btn sec" id="btnUndo" onclick="sfx('back');undo()" disabled>UNDO</button>
     </div>
   </div>
 
@@ -711,7 +869,7 @@ body {
 // ── AUDIO ENGINE (expanded) ───────────────────────────────
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let actx;
-function ensureAudio() { if (!actx) actx = new AudioCtx(); }
+function ensureAudio() { if (!actx) actx = new AudioCtx(); return actx; }
 
 function playNote(type, freq, dur, vol=0.07, delay=0) {
   ensureAudio();
@@ -825,6 +983,313 @@ function sfx(type) {
     }
   } catch(e) {}
 }
+
+
+
+// ── BACKGROUND MUSIC ─────────────────────────────────────────────────────────
+// Maple Leaf Rag — Scott Joplin (1899) — PUBLIC DOMAIN
+// 8-bit chiptune arrangement: melody (square) + stride bass (triangle)
+
+const Music = (() => {
+  const LS_KEY = "8bit_futures_music";
+  let enabled = (localStorage.getItem(LS_KEY) ?? "on") !== "off";
+
+  let ctx = null;
+  let melGain = null;
+  let bassGain = null;
+  let timer = null;
+  let noteIdx = 0;
+  let nextTime = 0;
+
+  const BPM = 132;
+  const midi = (m) => 440 * Math.pow(2, (m - 69) / 12);
+
+  function ensure() {
+    if (typeof ensureAudio === "function") ctx = ensureAudio();
+    else if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    if (!melGain) {
+      melGain = ctx.createGain();
+      melGain.gain.value = 0.09;
+      melGain.connect(ctx.destination);
+    }
+    if (!bassGain) {
+      bassGain = ctx.createGain();
+      bassGain.gain.value = 0.07;
+      bassGain.connect(ctx.destination);
+    }
+    return ctx;
+  }
+
+  function playVoice(note, t, dur, gainNode, waveType, vol) {
+    if (note == null || !ctx) return;
+    try {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = waveType;
+      o.frequency.setValueAtTime(midi(note), t);
+      const attack = 0.004;
+      const release = dur * 0.8;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + release);
+      o.connect(g);
+      g.connect(gainNode);
+      o.start(t);
+      o.stop(t + release + 0.05);
+    } catch(e) {}
+  }
+
+  // ── MAPLE LEAF RAG — 8-bit transcription ──
+  // Interleaved events: [beatOffset, 'M'|'B', midiNote, durationInBeats]
+  // M = melody (square wave), B = bass (triangle wave)
+  // Encoded as sections, then assembled into full form
+  // Key of Ab: Ab=56/68/80, Bb=58/70, C=60/72, Db=61/73, Eb=63/75, F=65/77
+
+  function buildSection(melNotes, bassNotes) {
+    const events = [];
+    let t = 0;
+    for (const [note, beats] of melNotes) {
+      if (note != null) events.push([t, 'M', note, beats]);
+      t += beats;
+    }
+    t = 0;
+    for (const [note, beats] of bassNotes) {
+      if (note != null) events.push([t, 'B', note, beats]);
+      t += beats;
+    }
+    const totalBeats = t;
+    return { events, totalBeats };
+  }
+
+  // ── SECTION A — The famous opening theme ──
+  const secA = buildSection(
+    // Melody (right hand) - 16 beats total (8 bars of 2/4)
+    [
+      // Pickup + bar 1: the iconic chromatic riff
+      [68,0.25],[69,0.25],[70,0.5], [75,0.5],[73,0.25],[72,0.25],
+      // Bar 2
+      [68,0.5],[72,0.5],[73,0.25],[75,0.25],[77,0.5],
+      // Bar 3
+      [75,0.25],[73,0.25],[72,0.5], [68,0.5],[70,0.25],[72,0.25],
+      // Bar 4
+      [68,0.75],[null,0.25],[null,0.5],[68,0.25],[69,0.25],
+      // Bar 5: repeat riff
+      [70,0.5],[75,0.5],[73,0.25],[72,0.25],[68,0.5],
+      // Bar 6
+      [72,0.5],[73,0.25],[75,0.25],[77,0.5],[75,0.5],
+      // Bar 7: turnaround
+      [73,0.25],[72,0.25],[70,0.5], [68,0.25],[70,0.25],[72,0.5],
+      // Bar 8
+      [68,0.75],[null,0.25],[null,0.5],[null,0.5],
+    ],
+    // Bass (left hand) - stride pattern: root-chord-fifth-chord
+    [
+      [44,0.5],[56,0.5],[51,0.5],[56,0.5],  // Ab - Eb/Ab
+      [44,0.5],[56,0.5],[51,0.5],[56,0.5],  // Ab
+      [41,0.5],[56,0.5],[48,0.5],[56,0.5],  // F bass - C bass
+      [44,0.5],[56,0.5],[51,0.5],[58,0.5],  // Ab - Eb
+      [44,0.5],[56,0.5],[51,0.5],[56,0.5],  // Ab
+      [49,0.5],[56,0.5],[44,0.5],[56,0.5],  // Db - Ab
+      [51,0.5],[58,0.5],[51,0.5],[58,0.5],  // Eb7
+      [44,0.5],[56,0.5],[44,0.5],[null,0.5], // Ab
+    ]
+  );
+
+  // ── SECTION B — Second strain, more lyrical ──
+  const secB = buildSection(
+    [
+      // Bar 1-2
+      [75,0.5],[77,0.25],[75,0.25],[73,0.5],[72,0.5],
+      [68,0.5],[72,0.5],[73,0.5],[75,0.5],
+      // Bar 3-4
+      [77,0.5],[75,0.25],[73,0.25],[72,0.5],[70,0.5],
+      [68,0.75],[null,0.25],[63,0.25],[65,0.25],[68,0.25],[70,0.25],
+      // Bar 5-6: climax
+      [72,0.5],[73,0.5],[75,0.5],[80,0.5],
+      [77,0.25],[75,0.25],[73,0.5],[72,0.5],[70,0.5],
+      // Bar 7-8: resolve
+      [68,0.5],[70,0.25],[72,0.25],[73,0.5],[72,0.5],
+      [68,0.75],[null,0.25],[null,0.5],[null,0.5],
+    ],
+    [
+      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
+      [44,0.5],[60,0.5],[51,0.5],[60,0.5],  // Ab
+      [46,0.5],[58,0.5],[46,0.5],[58,0.5],  // Bb min
+      [51,0.5],[58,0.5],[51,0.5],[58,0.5],  // Eb7
+      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
+      [44,0.5],[60,0.5],[51,0.5],[60,0.5],  // Ab
+      [51,0.5],[58,0.5],[44,0.5],[60,0.5],  // Eb7 - Ab
+      [44,0.5],[56,0.5],[44,0.5],[null,0.5], // Ab
+    ]
+  );
+
+  // ── SECTION C — Trio (brighter, in Db area) ──
+  const secC = buildSection(
+    [
+      // Bar 1-2
+      [73,0.5],[75,0.25],[73,0.25],[72,0.5],[68,0.5],
+      [70,0.25],[72,0.25],[73,0.5],[75,0.5],[77,0.5],
+      // Bar 3-4
+      [80,0.5],[77,0.5],[75,0.25],[73,0.25],[72,0.5],
+      [73,0.75],[null,0.25],[null,0.5],[null,0.5],
+      // Bar 5-6: ascending run
+      [61,0.25],[63,0.25],[65,0.25],[68,0.25],[70,0.5],[72,0.5],
+      [73,0.5],[75,0.5],[77,0.5],[75,0.5],
+      // Bar 7-8
+      [73,0.25],[72,0.25],[70,0.5],[68,0.25],[70,0.25],[72,0.5],
+      [68,0.75],[null,0.25],[null,0.5],[null,0.5],
+    ],
+    [
+      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
+      [44,0.5],[60,0.5],[44,0.5],[60,0.5],  // Ab
+      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
+      [44,0.5],[60,0.5],[51,0.5],[60,0.5],  // Ab
+      [41,0.5],[60,0.5],[48,0.5],[60,0.5],  // F min
+      [46,0.5],[58,0.5],[46,0.5],[58,0.5],  // Bb min
+      [51,0.5],[58,0.5],[44,0.5],[60,0.5],  // Eb7 - Ab
+      [44,0.5],[56,0.5],[44,0.5],[null,0.5], // Ab
+    ]
+  );
+
+  // Ragtime form: AA BB A CC DD A  (loops)
+  const FORM = [secA, secA, secB, secB, secA, secC, secC, secA];
+
+  // Pre-build the full loop as one flat timeline, sorted by beat
+  let fullLoop = [];
+  let loopBeats = 0;
+  for (const sec of FORM) {
+    for (const [beat, type, note, dur] of sec.events) {
+      fullLoop.push([loopBeats + beat, type, note, dur]);
+    }
+    loopBeats += sec.totalBeats;
+  }
+  fullLoop.sort((a, b) => a[0] - b[0]);
+
+  function schedule() {
+    if (!enabled || !ctx) return;
+    const spb = 60 / BPM; // seconds per beat
+    const horizon = ctx.currentTime + 0.3;
+
+    while (nextTime < horizon) {
+      // Find current position in the loop
+      const loopTime = noteIdx; // noteIdx tracks which event we're on
+      if (loopTime >= fullLoop.length) {
+        // Restart the loop
+        noteIdx = 0;
+      }
+
+      const evt = fullLoop[noteIdx];
+      if (!evt) { noteIdx = 0; continue; }
+
+      const [beat, type, note, dur] = evt;
+
+      // Calculate absolute time for this note
+      // We use nextTime as the base for the current loop start
+      const noteDur = dur * spb;
+
+      if (type === 'M') {
+        playVoice(note, nextTime, noteDur, melGain, 'square', 0.28);
+        // Occasional octave sparkle
+        if (noteIdx % 7 === 0 && note != null) {
+          playVoice(note + 12, nextTime + 0.008, noteDur * 0.5, melGain, 'square', 0.08);
+        }
+      } else {
+        playVoice(note, nextTime, noteDur, bassGain, 'triangle', 0.3);
+      }
+
+      // Advance to next event
+      noteIdx++;
+      // Calculate time gap to next event
+      if (noteIdx < fullLoop.length) {
+        const nextBeat = fullLoop[noteIdx][0];
+        const thisBeat = beat;
+        const gap = (nextBeat - thisBeat) * spb;
+        if (gap > 0) {
+          nextTime += gap;
+        }
+        // If gap is 0, events are simultaneous — keep scheduling in same timeslot
+      } else {
+        // End of loop, small gap then restart
+        nextTime += 0.05;
+        noteIdx = 0;
+      }
+    }
+  }
+
+  function start() {
+    if (!enabled) return;
+    ensure();
+    if (ctx.state === "suspended") ctx.resume();
+    if (!timer) {
+      nextTime = ctx.currentTime + 0.1;
+      noteIdx = 0;
+      timer = setInterval(schedule, 80);
+    }
+  }
+
+  function stop() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    if (melGain && ctx) {
+      try {
+        const t = ctx.currentTime;
+        melGain.gain.cancelScheduledValues(t);
+        melGain.gain.setTargetAtTime(0.0001, t, 0.03);
+        bassGain.gain.cancelScheduledValues(t);
+        bassGain.gain.setTargetAtTime(0.0001, t, 0.03);
+        setTimeout(() => {
+          if (melGain) melGain.gain.value = 0.09;
+          if (bassGain) bassGain.gain.value = 0.07;
+        }, 150);
+      } catch(e) {}
+    }
+  }
+
+  function setEnabled(on) {
+    enabled = !!on;
+    localStorage.setItem(LS_KEY, enabled ? "on" : "off");
+    if (enabled) start();
+    else stop();
+    updateButton();
+  }
+
+  function toggle() { setEnabled(!enabled); }
+
+  function updateButton() {
+    const b = document.getElementById("music-toggle");
+    if (!b) return;
+    b.classList.toggle("on", enabled);
+    b.setAttribute("aria-pressed", enabled ? "true" : "false");
+    b.textContent = enabled ? "MUSIC: ON" : "MUSIC: OFF";
+  }
+
+  function armAutoplay() {
+    const kick = () => {
+      if (enabled) start();
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+      window.removeEventListener("touchstart", kick);
+    };
+    window.addEventListener("pointerdown", kick, { once: true });
+    window.addEventListener("keydown", kick, { once: true });
+    window.addEventListener("touchstart", kick, { once: true });
+  }
+
+  function init() {
+    updateButton();
+    armAutoplay();
+  }
+
+  return { init, toggle, setEnabled };
+})();
+
+// Hook up the toggle button (additive; doesn't touch existing UI)
+window.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("music-toggle");
+  if (btn) btn.addEventListener("click", () => Music.toggle());
+  Music.init();
+});
 
 // ── PARTICLES ─────────────────────────────────────────────
 const pCanvas = document.getElementById('particles');
@@ -1602,8 +2067,8 @@ document.addEventListener('keydown',e=>{
 });
 
 showScreen('title-screen');
+
 </script>
 
-
-
-</body></html>
+</body>
+</html>
