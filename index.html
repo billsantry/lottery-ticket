@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>NOT A LOTTERY TICKET: 8-BIT FUTURES</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -35,6 +38,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 #crt {
@@ -201,7 +207,7 @@ body {
 }
 
 .menu-hint {
-  font-size: 6px;
+  font-size: 7px;
   color: var(--dim);
   margin-top: 4px;
   display: block;
@@ -290,7 +296,7 @@ body {
   margin-right: 6px;
 }
 .sc-name { font-size: 8px; margin-bottom: 8px; }
-.sc-desc { font-size: 6px; color: #D1CFCF; line-height: 1.8; margin-bottom: 6px; }
+.sc-desc { font-size: 6px; color: #cfcff3; line-height: 1.8; margin-bottom: 6px; }
 .sc-stats { font-size: 6px; color: #8888b0; line-height: 2; }
 
 .go-btn {
@@ -412,14 +418,14 @@ body {
   background: var(--panel);
   border: 2px solid var(--border);
   image-rendering: pixelated;
-  min-height: 80px;
+  min-height: 60px;
 }
 .action-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
   gap: 4px;
   overflow-y: auto;
-  max-height: 180px;
+  max-height: 200px;
   padding: 3px;
 }
 
@@ -431,7 +437,7 @@ body {
   transition: all 0.15s;
   font-size: 6px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   text-align: left;
 }
 .act-card::before {
@@ -611,7 +617,7 @@ body {
   .stance-grid { grid-template-columns: 1fr; }
   .sum-grid { grid-template-columns: 1fr 1fr; }
   .action-grid { max-height: 280px; grid-template-columns: 1fr 1fr; }
-  .act-card { padding: 12px 10px; min-height: 80px; }
+  .act-card { padding: 8px 10px; }
   .act-card .act-name { font-size: 7px; margin-bottom: 5px; }
   .act-card .act-cost { margin-bottom: 4px; }
   .act-card .act-fx { line-height: 1.8; }
@@ -619,7 +625,7 @@ body {
 
 @media (max-width: 500px) {
   .action-grid { grid-template-columns: 1fr; max-height: 300px; }
-  .act-card { min-height: 70px; padding: 10px; }
+  .act-card { padding: 10px; }
   .res-row { gap: 6px; padding: 4px 8px; font-size: 6px; }
   .res-bar { width: 40px; }
   .hv-bar { width: 35px; }
@@ -634,8 +640,8 @@ body {
 :root{
   --ui-gap: 4px;
   --ui-pad: 6px;
-  --actions-min-h: 100px;
-  --actions-max-h: 28%;
+  --actions-min-h: 120px;
+  --actions-max-h: 38%;
 }
 
 /* Use dynamic viewport height where supported */
@@ -681,7 +687,7 @@ body{
 /* World canvas should be the primary flexible grow/shrink element */
 #world-canvas{
   flex: 1 1 auto;
-  min-height: 80px;
+  min-height: 60px;
   height: auto;
   max-height: none;
 }
@@ -697,7 +703,7 @@ body{
   min-height: var(--actions-min-h);
   max-height: var(--actions-max-h);
   overflow: auto;
-  padding: 4px;
+  padding: 3px;
 }
 
 /* Right column: log container must be allowed to shrink */
@@ -753,6 +759,193 @@ body{
   box-shadow: 0 0 18px rgba(255,204,0,0.15), inset 0 0 12px rgba(255,204,0,0.06);
 }
 #music-toggle:focus { outline: 2px dashed var(--accent); outline-offset: 3px; }
+
+/* ── Desktop: hide mobile-only elements ── */
+.log-toggle-btn { display: none !important; }
+.log-close { display: none; }
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE — iPhone & similar (≤ 780px)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 780px) {
+
+  /* Drop 4:3 box + zoom — go full screen */
+  #game-root {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    zoom: 1 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Play screen: tight vertical stack */
+  #play-screen.active {
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 3px;
+    padding: 4px;
+  }
+
+  /* HUD: compact single row */
+  .hud {
+    padding: 4px 8px;
+    font-size: 8px;
+    gap: 4px;
+  }
+
+  /* Resource row: 2-row wrap */
+  .res-row {
+    padding: 3px 6px;
+    gap: 4px;
+    font-size: 7px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .res-bar { width: 30px; height: 6px; }
+  .hv-bar { width: 25px; }
+
+  /* Main area: single column, log hidden */
+  .main-area {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 1fr auto auto !important;
+    gap: 3px;
+  }
+
+  /* World canvas: shorter on mobile */
+  #world-canvas {
+    min-height: 50px;
+    max-height: 120px;
+  }
+
+  /* Action count */
+  .act-count {
+    padding: 3px;
+    font-size: 8px;
+  }
+
+  /* Action grid: 2-col, scrollable, bigger touch targets */
+  .action-grid {
+    grid-template-columns: 1fr 1fr !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    gap: 3px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
+
+  .act-card {
+    padding: 6px;
+    min-height: 0;
+    font-size: 8px;
+  }
+  .act-card .act-name { font-size: 9px; }
+  .act-card .act-cost { font-size: 8px; }
+  .act-card .act-fx { font-size: 8px; line-height: 1.5; }
+  .act-tag { font-size: 6px; }
+
+  /* Event log: slide-out overlay from right */
+  .log-col {
+    display: none !important;
+  }
+  .log-col.open {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 75vw;
+    height: 100dvh;
+    z-index: 100;
+    background: var(--bg);
+    border-left: 2px solid var(--accent);
+    box-shadow: -8px 0 30px rgba(0,0,0,0.7);
+    flex-direction: column;
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  /* Log close button */
+  .log-close {
+    display: block;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    z-index: 101;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  /* Show LOG button in bottom bar */
+  .log-toggle-btn {
+    display: inline-block !important;
+  }
+
+  /* Bottom bar: compact */
+  .bot-bar {
+    padding: 3px;
+    gap: 6px;
+  }
+  .g-btn {
+    font-size: 8px;
+    padding: 10px 14px;
+  }
+
+  /* Music toggle: smaller on mobile */
+  #music-toggle {
+    font-size: 6px;
+    padding: 6px 8px;
+    top: 4px;
+    right: 4px;
+  }
+
+  /* Title screen */
+  .title-main { font-size: 16px; }
+  .title-sub { font-size: 7px; padding: 0 10px; }
+  .menu-btn { font-size: 8px; padding: 14px; min-width: 200px; }
+
+  /* Stance selection */
+  .stance-grid { grid-template-columns: 1fr !important; gap: 6px; }
+  .stance-card { padding: 10px; }
+  .sc-name { font-size: 8px; }
+  .sc-desc { font-size: 7px; }
+  .sc-stats { font-size: 7px; }
+
+  /* Event overlay */
+  .evt-box { width: 90vw; padding: 16px; }
+  .evt-name { font-size: 11px; }
+  .evt-desc { font-size: 8px; }
+  .evt-flavor { font-size: 7px; }
+
+  /* Log entries */
+  .log-title { font-size: 8px; }
+  .log-entry { font-size: 7px; }
+  .log-year { font-size: 7px; }
+
+  /* Summary */
+  #summary-screen { padding: 12px; font-size: 7px; }
+  .sum-grid { grid-template-columns: 1fr !important; }
+
+  /* Glossary */
+  #glossary-screen { padding: 12px; font-size: 7px; }
+}
+
+/* Extra small phones (iPhone SE etc) */
+@media (max-width: 380px) {
+  .action-grid { grid-template-columns: 1fr !important; }
+  .act-card { min-height: 0; font-size: 8px; }
+  .res-row { font-size: 6px; }
+  .res-bar { width: 24px; }
+  .title-main { font-size: 12px; }
+}
 
 </style>
 </head>
@@ -821,12 +1014,14 @@ body{
         <div class="act-count" id="actCount">ACTIONS: 3 / 3</div>
         <div class="action-grid" id="actGrid"></div>
       </div>
-      <div class="log-col">
+      <div class="log-col" id="logCol">
+        <button class="log-close" onclick="document.getElementById('logCol').classList.remove('open')">✕</button>
         <div class="log-title">◈ EVENT LOG</div>
         <div class="log-list" id="logList"></div>
       </div>
     </div>
     <div class="bot-bar">
+      <button class="g-btn log-toggle-btn" onclick="document.getElementById('logCol').classList.toggle('open')">LOG</button>
       <button class="g-btn" id="btnEnd" onclick="sfx('confirm');endYear()">END YEAR ▶</button>
       <button class="g-btn sec" id="btnUndo" onclick="sfx('back');undo()" disabled>UNDO</button>
     </div>
