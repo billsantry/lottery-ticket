@@ -7,22 +7,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <title>NOT A LOTTERY TICKET: 8-BIT FUTURES</title>
-
-<!-- Open Graph (LinkedIn Preview) -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="NOT A LOTTERY TICKET: 8-BIT FUTURES">
-<meta property="og:description" content="A retro strategy game inspired by Peter Thiel’s 'You Are Not a Lottery Ticket.' Choose a worldview. Allocate resources. Shape your future across 12 years.">
-<meta property="og:url" content="https://lottery.billsantry.com/">
-<meta property="og:image" content="https://lottery.billsantry.com/preview.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Screenshot of NOT A LOTTERY TICKET gameplay">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NOT A LOTTERY TICKET: 8-BIT FUTURES">
-<meta name="twitter:description" content="Choose a worldview. Allocate resources. Shape your future across 12 years.">
-<meta name="twitter:image" content="https://lottery.billsantry.com/preview.png">
-  
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -780,6 +764,53 @@ body{
 .log-toggle-btn { display: none !important; }
 .log-close { display: none; }
 
+/* ── YEAR TRANSITION CINEMATIC ── */
+#year-transition {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 85;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#year-transition.show { display: flex; }
+.yt-content { text-align: center; }
+.yt-year {
+  font-size: 28px;
+  color: var(--accent);
+  text-shadow: 0 0 30px rgba(255,204,0,0.6);
+  opacity: 0;
+  transform: scale(0.5);
+  animation: ytYearIn 0.6s ease-out 0.1s forwards;
+}
+.yt-headline {
+  font-size: 9px;
+  color: var(--text);
+  margin-top: 16px;
+  opacity: 0;
+  letter-spacing: 2px;
+  line-height: 1.8;
+  animation: ytFadeIn 0.5s ease-out 0.5s forwards;
+}
+.yt-subline {
+  font-size: 7px;
+  color: var(--dim);
+  margin-top: 10px;
+  opacity: 0;
+  font-style: italic;
+  animation: ytFadeIn 0.4s ease-out 0.9s forwards;
+}
+@keyframes ytYearIn {
+  0% { opacity:0; transform: scale(0.5); }
+  60% { opacity:1; transform: scale(1.15); }
+  100% { opacity:1; transform: scale(1); }
+}
+@keyframes ytFadeIn {
+  from { opacity:0; transform: translateY(8px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
 /* ══════════════════════════════════════════════════════════════
    MOBILE — iPhone & similar (≤ 780px)
    ══════════════════════════════════════════════════════════════ */
@@ -923,6 +954,11 @@ body{
     right: 4px;
   }
 
+  /* Year transition: mobile sizing */
+  .yt-year { font-size: 20px; }
+  .yt-headline { font-size: 8px; }
+  .yt-subline { font-size: 6px; }
+
   /* Title screen */
   .title-main { font-size: 16px; }
   .title-sub { font-size: 7px; padding: 0 10px; }
@@ -988,7 +1024,7 @@ body{
 
   <!-- ═══ STANCE SELECT ═══ -->
   <div id="stance-screen" class="screen">
-    <div class="stance-title" id="stanceTitle">YOU ARE NOT A LOTTERY TICKET</div>
+    <div class="stance-title" id="stanceTitle">CHOOSE YOUR FUTURE STANCE</div>
     <div class="stance-grid">
       <div class="stance-card" data-s="DO" onclick="pickStance('DO')" tabindex="0">
         <div class="sc-name"><span class="sc-tag" style="background:var(--do)">DO</span> <span style="color:var(--do)">DETERMINATE OPTIMISM</span></div>
@@ -1043,6 +1079,15 @@ body{
     </div>
   </div>
 
+  <!-- ═══ YEAR TRANSITION ═══ -->
+  <div id="year-transition">
+    <div class="yt-content">
+      <div class="yt-year" id="ytYear"></div>
+      <div class="yt-headline" id="ytHeadline"></div>
+      <div class="yt-subline" id="ytSubline"></div>
+    </div>
+  </div>
+
   <!-- ═══ EVENT OVERLAY ═══ -->
   <div id="event-overlay">
     <div class="evt-box">
@@ -1075,8 +1120,8 @@ body{
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  NOT A LOTTERY TICKET: 8-BIT FUTURES v3
-//  Now with irony, absurdity, and a much bigger sound palette
+//  NOT A LOTTERY TICKET: 8-BIT FUTURES v4
+//  Living world, year cinematics, dynamic music tension
 // ═══════════════════════════════════════════════════════════
 
 // ── AUDIO ENGINE (expanded) ───────────────────────────────
@@ -1213,8 +1258,10 @@ const Music = (() => {
   let timer = null;
   let noteIdx = 0;
   let nextTime = 0;
+  let tense = false; // tension mode: slower, quieter bass
 
   const BPM = 132;
+  const BPM_TENSE = 108;
   const midi = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
   function ensure() {
@@ -1381,7 +1428,7 @@ const Music = (() => {
 
   function schedule() {
     if (!enabled || !ctx) return;
-    const spb = 60 / BPM; // seconds per beat
+    const spb = 60 / (tense ? BPM_TENSE : BPM); // seconds per beat
     const horizon = ctx.currentTime + 0.3;
 
     while (nextTime < horizon) {
@@ -1494,7 +1541,18 @@ const Music = (() => {
     armAutoplay();
   }
 
-  return { init, toggle, setEnabled };
+  function setTension(on) {
+    tense = !!on;
+    if (!ctx || !melGain || !bassGain) return;
+    try {
+      const t = ctx.currentTime;
+      // Tense = quieter melody, muffled bass; normal = full sound
+      melGain.gain.setTargetAtTime(on ? 0.05 : 0.09, t, 0.3);
+      bassGain.gain.setTargetAtTime(on ? 0.04 : 0.07, t, 0.3);
+    } catch(e) {}
+  }
+
+  return { init, toggle, setEnabled, setTension };
 })();
 
 // Hook up the toggle button (additive; doesn't touch existing UI)
@@ -1773,12 +1831,25 @@ function startYear() {
   const p=cp();
   p.actUsed=0; p.undos=[];
   regen(p);
-  startTimer();
-  renderHUD(); renderRes(); renderActs(); renderLog(); renderWorld();
-  document.getElementById('btnEnd').disabled=false;
-  document.getElementById('btnUndo').disabled=true;
-  addLog(`── YEAR ${G.year} ──`,'t-year');
-  if(G.mode===2) addLog(`Player ${G.cp+1} (${p.stance}) turn`,'t-year');
+
+  // Show cinematic transition (skip year 1 first player to avoid delay on game start)
+  const skipTransition = G.year === 1 && G.cp === 0;
+
+  function doStart() {
+    startTimer();
+    renderHUD(); renderRes(); renderActs(); renderLog(); renderWorld();
+    startWorldAnim();
+    document.getElementById('btnEnd').disabled=false;
+    document.getElementById('btnUndo').disabled=true;
+    addLog(`── YEAR ${G.year} ──`,'t-year');
+    if(G.mode===2) addLog(`Player ${G.cp+1} (${p.stance}) turn`,'t-year');
+  }
+
+  if (skipTransition) {
+    doStart();
+  } else {
+    showYearTransition(G.year, p, doStart);
+  }
 }
 
 function regen(p) {
@@ -1950,17 +2021,20 @@ function showEventPopup(evt, afx) {
     sfx(hasGood?'breakthrough':'crash');
     spawnP(window.innerWidth/2,window.innerHeight/2,60,'#ffcc00',200);
     spawnP(window.innerWidth/2,window.innerHeight/2,40,'#fff',150);
-    if(!hasGood) shake();
+    if(!hasGood) { shake(); worldShock(); }
+    else worldOpportunity();
   } else if(evt.t==='shock') {
-    // Pick from negative sounds
     const shockSounds=['shock','damage','crash','alarm','sad_trombone','whomp','drain'];
     sfx(shockSounds[Math.floor(Math.random()*shockSounds.length)]);
-    shake();
+    shake(); worldShock();
     spawnP(window.innerWidth/2,window.innerHeight/2,30,'#ff1744',120);
+    if(typeof Music !== 'undefined' && Music.setTension) Music.setTension(true);
   } else if(evt.t==='opportunity') {
     const oppSounds=['opportunity','cha_ching','heal','sparkle','levelup','powerup'];
     sfx(oppSounds[Math.floor(Math.random()*oppSounds.length)]);
     spawnP(window.innerWidth/2,window.innerHeight/2,25,'#00e676',100);
+    worldOpportunity();
+    if(typeof Music !== 'undefined' && Music.setTension) Music.setTension(false);
   } else {
     sfx('shift');
     spawnP(window.innerWidth/2,window.innerHeight/2,15,'#ff6ec7',80);
@@ -2155,114 +2229,479 @@ function renderLog() {
   list.innerHTML=h;
 }
 
-// ── WORLD CANVAS ──────────────────────────────────────────
-let worldCtx;
-function renderWorld() {
-  const canvas=document.getElementById('world-canvas');
-  if(!canvas) return;
-  const rect=canvas.parentElement.getBoundingClientRect();
-  canvas.width=Math.floor(rect.width);
-  canvas.height=Math.floor(Math.max(120,rect.height-260));
-  worldCtx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height,p=cp();
+// ── YEAR TRANSITION CINEMATIC ──────────────────────────────
+const YEAR_HEADLINES = {
+  early: [ // Years 1-4
+    ["THE FOUNDATION","Every empire starts with a napkin sketch"],
+    ["FIRST STEPS","The journey of a thousand pivots begins"],
+    ["SEEDS PLANTED","Now we wait. And burn cash."],
+    ["EARLY DAYS","Nobody knows your name. Yet."],
+  ],
+  mid: [ // Years 5-8
+    ["THE GRIND","Glamour fades. Spreadsheets remain."],
+    ["HALFWAY THERE","Too late to quit. Too early to celebrate."],
+    ["THE CRUCIBLE","This is where pretenders break"],
+    ["INFLECTION POINT","The next move changes everything"],
+  ],
+  late: [ // Years 9-11
+    ["THE FINAL ACT","History is watching"],
+    ["ENDGAME APPROACHES","No more practice rounds"],
+    ["LEGACY TIME","What will they say you built?"],
+    ["THE HOME STRETCH","Every decision is magnified now"],
+  ],
+  finale: [
+    ["THE FINAL YEAR","This is it. Make it count."],
+  ],
+};
 
-  const skyColors={DO:[`#0a1628`,`#1a3a6a`],IO:[`#1a0a28`,`#3a1a5a`],DP:[`#0a140a`,`#1a3a1a`],IP:[`#1a1408`,`#3a2a10`]};
-  const [skyTop,skyBot]=skyColors[p.stance]||skyColors.DO;
-  const skyGrad=worldCtx.createLinearGradient(0,0,0,H);
-  skyGrad.addColorStop(0,skyTop);skyGrad.addColorStop(1,skyBot);
-  worldCtx.fillStyle=skyGrad;worldCtx.fillRect(0,0,W,H);
+const STANCE_HEADLINES = {
+  DO: {
+    high: ["THE PLAN IS WORKING","Conviction compounds"],
+    low: ["THE VISION WAVERS","Even believers have doubts"],
+  },
+  IO: {
+    high: ["OPTIONS EVERYWHERE","The portfolio diversifies"],
+    low: ["SPREADING TOO THIN","Optionality has a cost"],
+  },
+  DP: {
+    high: ["THE WALLS HOLD","Fortress strategy pays off"],
+    low: ["CRACKS IN THE BUNKER","Even fortresses need upkeep"],
+  },
+  IP: {
+    high: ["COMPLIANCE ACHIEVED","The paperwork is immaculate"],
+    low: ["DROWNING IN PROCESS","The forms have forms now"],
+  },
+};
 
-  for(let i=0;i<40;i++){
-    const sx=((42*i*137)%W),sy=((42*i*73)%(H*0.6));
-    const bright=0.3+Math.sin(Date.now()*0.002+i)*0.3;
-    worldCtx.globalAlpha=bright;worldCtx.fillStyle='#fff';
-    worldCtx.fillRect(Math.floor(sx),Math.floor(sy),1,1);
+function getYearHeadline(year, player) {
+  // Mix of era-based and stance-based headlines
+  const useStance = Math.random() > 0.5 && year > 2;
+
+  if (useStance) {
+    const hv = {DO:'conviction',IO:'optionality',DP:'resilience',IP:'bureaucracy'}[player.stance];
+    const level = player.hid[hv] > 35 ? 'high' : 'low';
+    const [headline, sub] = STANCE_HEADLINES[player.stance][level];
+    return { headline, sub };
   }
-  worldCtx.globalAlpha=1;
 
-  const groundY=H*0.75;
-  worldCtx.fillStyle='#0a0a0a';worldCtx.fillRect(0,groundY,W,H-groundY);
-  worldCtx.fillStyle='#1a1a2a';worldCtx.fillRect(0,groundY,W,2);
+  let pool;
+  if (year >= 12) pool = YEAR_HEADLINES.finale;
+  else if (year >= 9) pool = YEAR_HEADLINES.late;
+  else if (year >= 5) pool = YEAR_HEADLINES.mid;
+  else pool = YEAR_HEADLINES.early;
 
-  const wealth=p.score.wealth+p.res.money*0.3;
-  const buildCount=Math.min(20,Math.floor(3+wealth/15));
-  const maxBuildH=H*0.55;
+  const [headline, sub] = pool[Math.floor(Math.random() * pool.length)];
+  return { headline, sub };
+}
 
-  for(let i=0;i<buildCount;i++){
-    const bx=15+i*(W-30)/buildCount;
-    const seed=(i*7+13)*37;
-    const bw=12+(seed%20);
-    let bh=15+(seed%30)+(wealth/8)+(p.score.breakthrough*1.5);
-    bh=Math.min(maxBuildH,bh);
-    const bColors={DO:'#1a4a6a',IO:'#4a1a4a',DP:'#1a3a1a',IP:'#3a2a0a'};
-    worldCtx.fillStyle=bColors[p.stance];
-    worldCtx.fillRect(Math.floor(bx),Math.floor(groundY-bh),Math.floor(bw),Math.floor(bh));
-    const winColor=SC[p.stance];
-    for(let wy=groundY-bh+4;wy<groundY-4;wy+=8){
-      for(let wx=bx+3;wx<bx+bw-3;wx+=6){
-        if(Math.random()>0.4){
-          worldCtx.globalAlpha=0.3+Math.random()*0.5;
-          worldCtx.fillStyle=winColor;
-          worldCtx.fillRect(Math.floor(wx),Math.floor(wy),3,4);
+function showYearTransition(year, player, callback) {
+  const el = document.getElementById('year-transition');
+  const { headline, sub } = getYearHeadline(year, player);
+
+  document.getElementById('ytYear').textContent = `YEAR ${year}`;
+  document.getElementById('ytHeadline').textContent = headline;
+  document.getElementById('ytSubline').textContent = sub;
+
+  // Reset animations
+  el.classList.remove('show');
+  void el.offsetWidth;
+
+  // Re-trigger child animations by cloning
+  ['ytYear','ytHeadline','ytSubline'].forEach(id => {
+    const node = document.getElementById(id);
+    node.style.animation = 'none';
+    void node.offsetWidth;
+    node.style.animation = '';
+  });
+
+  el.classList.add('show');
+  sfx('dramatic');
+
+  setTimeout(() => {
+    el.classList.remove('show');
+    if (callback) callback();
+  }, 2000);
+}
+
+// ── WORLD CANVAS (LIVING) ─────────────────────────────────
+let worldCtx, worldW, worldH;
+let worldAnim = { buildings: [], cranes: [], weather: [], character: { x: 50, frame: 0 }, lastShock: 0, lastOpp: 0 };
+
+function initWorldBuildings(p) {
+  const wealth = p.score.wealth + p.res.money * 0.3;
+  const count = Math.min(15, Math.floor(3 + wealth / 20));
+  const buildings = [];
+  for (let i = 0; i < Math.max(count, worldAnim.buildings.length); i++) {
+    const seed = (i * 7 + 13) * 37;
+    const bw = 14 + (seed % 18);
+    let targetH = 20 + (seed % 25) + (wealth / 8) + (p.score.breakthrough * 1.5);
+    targetH = Math.min(worldH * 0.55, targetH);
+
+    if (i < count) {
+      if (worldAnim.buildings[i]) {
+        worldAnim.buildings[i].targetH = targetH;
+        worldAnim.buildings[i].w = bw;
+      } else {
+        buildings.push({
+          x: 15 + i * ((worldW - 30) / Math.max(count, 1)),
+          w: bw, h: 0, targetH,
+          crane: targetH > (worldAnim.buildings[i]?.h || 0) + 10,
+          damage: 0, // 0-1, visual damage overlay
+        });
+      }
+    }
+  }
+  // Keep existing, add new
+  worldAnim.buildings = [...worldAnim.buildings.slice(0, count), ...buildings.slice(worldAnim.buildings.length)];
+  // Remove excess
+  worldAnim.buildings = worldAnim.buildings.slice(0, count);
+}
+
+function tickWorldAnim(p) {
+  const now = Date.now();
+
+  // Animate buildings growing/shrinking
+  worldAnim.buildings.forEach(b => {
+    const diff = b.targetH - b.h;
+    if (Math.abs(diff) > 0.5) {
+      b.h += diff * 0.04; // Smooth lerp
+      if (diff > 5) b.crane = true;
+    } else {
+      b.h = b.targetH;
+      b.crane = false;
+    }
+    // Heal damage over time
+    if (b.damage > 0) b.damage = Math.max(0, b.damage - 0.002);
+  });
+
+  // Character walk
+  worldAnim.character.frame = (worldAnim.character.frame + 0.08) % 4;
+  const targetX = 20 + (p.actHist.length % 8) * (worldW / 10);
+  worldAnim.character.x += (targetX - worldAnim.character.x) * 0.02;
+
+  // Weather particles
+  if (G.worldTension > 50) {
+    // Rain
+    if (Math.random() < (G.worldTension - 50) / 200) {
+      worldAnim.weather.push({
+        x: Math.random() * worldW, y: 0,
+        vy: 3 + Math.random() * 2, type: 'rain', life: 1,
+      });
+    }
+  }
+  if (G.worldTension > 75 && Math.random() < 0.01) {
+    // Lightning
+    worldAnim.weather.push({ type: 'lightning', life: 0.3, x: Math.random() * worldW });
+  }
+
+  // Tick weather
+  worldAnim.weather = worldAnim.weather.filter(w => {
+    if (w.type === 'rain') {
+      w.y += w.vy;
+      return w.y < worldH;
+    }
+    if (w.type === 'lightning') {
+      w.life -= 0.02;
+      return w.life > 0;
+    }
+    return false;
+  });
+}
+
+function drawWorld(p) {
+  if (!worldCtx) return;
+  const W = worldW, H = worldH;
+  const ctx = worldCtx;
+
+  // Sky gradient based on stance + tension
+  const skyColors = {
+    DO: [`#0a1628`,`#1a3a6a`], IO: [`#1a0a28`,`#3a1a5a`],
+    DP: [`#0a140a`,`#1a3a1a`], IP: [`#1a1408`,`#3a2a10`],
+  };
+  const tensionDarken = G.worldTension / 300;
+  const [skyTop, skyBot] = skyColors[p.stance] || skyColors.DO;
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, skyTop);
+  skyGrad.addColorStop(1, skyBot);
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Darken sky with tension
+  if (tensionDarken > 0.05) {
+    ctx.fillStyle = `rgba(0,0,0,${tensionDarken})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Stars (twinkle)
+  const now = Date.now();
+  for (let i = 0; i < 35; i++) {
+    const sx = ((42 * i * 137) % W), sy = ((42 * i * 73) % (H * 0.5));
+    const bright = 0.2 + Math.sin(now * 0.001 + i * 1.7) * 0.4;
+    ctx.globalAlpha = Math.max(0, bright);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
+  }
+  ctx.globalAlpha = 1;
+
+  // Lightning flash
+  worldAnim.weather.filter(w => w.type === 'lightning').forEach(w => {
+    ctx.fillStyle = `rgba(255,255,255,${w.life})`;
+    ctx.fillRect(0, 0, W, H);
+    // Lightning bolt
+    ctx.strokeStyle = '#fff';
+    ctx.globalAlpha = w.life * 2;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let lx = w.x, ly = 0;
+    ctx.moveTo(lx, ly);
+    for (let s = 0; s < 6; s++) {
+      lx += (Math.random() - 0.5) * 25;
+      ly += 10 + Math.random() * 15;
+      ctx.lineTo(lx, ly);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // Ground
+  const groundY = H * 0.75;
+  ctx.fillStyle = '#080810';
+  ctx.fillRect(0, groundY, W, H - groundY);
+
+  // Ground line with stance color glow
+  ctx.fillStyle = SC[p.stance];
+  ctx.globalAlpha = 0.3;
+  ctx.fillRect(0, groundY, W, 1);
+  ctx.globalAlpha = 0.1;
+  ctx.fillRect(0, groundY + 1, W, 2);
+  ctx.globalAlpha = 1;
+
+  // Buildings
+  const bColors = { DO: '#1a4a6a', IO: '#4a1a4a', DP: '#1a3a1a', IP: '#3a2a0a' };
+  const bHiColors = { DO: '#2a6a8a', IO: '#6a2a6a', DP: '#2a5a2a', IP: '#5a3a1a' };
+
+  worldAnim.buildings.forEach((b, i) => {
+    if (b.h < 2) return;
+    const bx = Math.floor(b.x);
+    const bh = Math.floor(b.h);
+    const by = Math.floor(groundY - bh);
+
+    // Building body
+    ctx.fillStyle = bColors[p.stance];
+    ctx.fillRect(bx, by, b.w, bh);
+
+    // Highlight edge
+    ctx.fillStyle = bHiColors[p.stance];
+    ctx.fillRect(bx, by, 2, bh);
+
+    // Damage overlay (red tint)
+    if (b.damage > 0) {
+      ctx.fillStyle = `rgba(255,20,20,${b.damage * 0.4})`;
+      ctx.fillRect(bx, by, b.w, bh);
+      // Damage cracks
+      if (b.damage > 0.3) {
+        ctx.strokeStyle = `rgba(60,20,20,${b.damage})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(bx + b.w / 2, by);
+        ctx.lineTo(bx + b.w / 2 + 3, by + bh * 0.3);
+        ctx.lineTo(bx + b.w / 2 - 2, by + bh * 0.6);
+        ctx.stroke();
+      }
+    }
+
+    // Windows
+    const winColor = SC[p.stance];
+    for (let wy = by + 4; wy < groundY - 4; wy += 7) {
+      for (let wx = bx + 3; wx < bx + b.w - 3; wx += 5) {
+        // Windows flicker
+        const lit = Math.sin(now * 0.0008 + i * 3 + wx * 0.5 + wy * 0.3) > -0.2;
+        if (lit) {
+          ctx.globalAlpha = 0.3 + Math.sin(now * 0.002 + wx + wy) * 0.2;
+          ctx.fillStyle = winColor;
+          ctx.fillRect(wx, wy, 2, 3);
         }
       }
     }
-    worldCtx.globalAlpha=1;
-    if(bh>maxBuildH*0.6){
-      worldCtx.fillStyle='#444';
-      worldCtx.fillRect(Math.floor(bx+bw/2),Math.floor(groundY-bh-8),1,8);
-      if(Math.sin(Date.now()*0.003+i)>0){
-        worldCtx.fillStyle='#ff0000';
-        worldCtx.fillRect(Math.floor(bx+bw/2),Math.floor(groundY-bh-9),2,2);
+    ctx.globalAlpha = 1;
+
+    // Construction crane
+    if (b.crane && b.h > 10) {
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 1;
+      // Vertical mast
+      ctx.beginPath();
+      ctx.moveTo(bx + b.w / 2, by);
+      ctx.lineTo(bx + b.w / 2, by - 12);
+      ctx.stroke();
+      // Boom arm
+      const armSwing = Math.sin(now * 0.001 + i) * 8;
+      ctx.beginPath();
+      ctx.moveTo(bx + b.w / 2, by - 11);
+      ctx.lineTo(bx + b.w / 2 + armSwing + 10, by - 11);
+      ctx.stroke();
+      // Cable
+      ctx.strokeStyle = '#666';
+      ctx.beginPath();
+      ctx.moveTo(bx + b.w / 2 + armSwing + 10, by - 11);
+      ctx.lineTo(bx + b.w / 2 + armSwing + 10, by - 5);
+      ctx.stroke();
+    }
+
+    // Antenna on tall buildings
+    if (bh > H * 0.35) {
+      ctx.fillStyle = '#555';
+      ctx.fillRect(bx + b.w / 2, by - 6, 1, 6);
+      if (Math.sin(now * 0.003 + i) > 0) {
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(bx + b.w / 2, by - 7, 2, 2);
       }
     }
+  });
+
+  // Rain
+  ctx.strokeStyle = 'rgba(100,140,200,0.3)';
+  ctx.lineWidth = 1;
+  worldAnim.weather.filter(w => w.type === 'rain').forEach(w => {
+    ctx.beginPath();
+    ctx.moveTo(w.x, w.y);
+    ctx.lineTo(w.x - 1, w.y + 4);
+    ctx.stroke();
+  });
+
+  // Stance-specific visual overlays
+  if (p.stance === 'DO' && p.hid.conviction > 25) {
+    // Beacon of conviction — pulsing vertical light
+    const pulse = 0.1 + Math.sin(now * 0.002) * 0.05;
+    ctx.globalAlpha = (p.hid.conviction / 100) * pulse;
+    const beamGrad = ctx.createLinearGradient(W / 2, 0, W / 2, groundY);
+    beamGrad.addColorStop(0, SC.DO);
+    beamGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = beamGrad;
+    ctx.fillRect(W / 2 - 3, 0, 6, groundY);
+    ctx.globalAlpha = 1;
   }
 
-  if(p.stance==='DO'&&p.hid.conviction>30){
-    worldCtx.globalAlpha=(p.hid.conviction/100)*0.3;
-    worldCtx.fillStyle=SC.DO;
-    worldCtx.fillRect(W/2-2,0,4,groundY);
-    worldCtx.globalAlpha=1;
-  }
-
-  if(p.stance==='IO'&&p.hid.optionality>20){
-    const nodes=Math.floor(p.hid.optionality/10);
-    worldCtx.strokeStyle=SC.IO;worldCtx.globalAlpha=0.3;worldCtx.lineWidth=1;
-    const pts=[];
-    for(let i=0;i<nodes;i++){
-      const nx=30+((i*97+31)%(W-60)),ny=20+((i*53+17)%(groundY-40));
-      pts.push([nx,ny]);worldCtx.fillStyle=SC.IO;worldCtx.fillRect(nx-1,ny-1,3,3);
+  if (p.stance === 'IO' && p.hid.optionality > 15) {
+    // Network nodes
+    const nodes = Math.floor(p.hid.optionality / 12);
+    const pts = [];
+    ctx.globalAlpha = 0.25;
+    for (let i = 0; i < nodes; i++) {
+      const nx = 25 + ((i * 97 + 31) % (W - 50));
+      const ny = 15 + ((i * 53 + 17) % (groundY - 30));
+      pts.push([nx, ny]);
+      ctx.fillStyle = SC.IO;
+      ctx.fillRect(nx - 1, ny - 1, 3, 3);
     }
-    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
-      if(Math.abs(pts[i][0]-pts[j][0])+Math.abs(pts[i][1]-pts[j][1])<150){
-        worldCtx.beginPath();worldCtx.moveTo(pts[i][0],pts[i][1]);worldCtx.lineTo(pts[j][0],pts[j][1]);worldCtx.stroke();
+    ctx.strokeStyle = SC.IO;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        if (Math.abs(pts[i][0] - pts[j][0]) + Math.abs(pts[i][1] - pts[j][1]) < 120) {
+          ctx.beginPath();
+          ctx.moveTo(pts[i][0], pts[i][1]);
+          ctx.lineTo(pts[j][0], pts[j][1]);
+          ctx.stroke();
+        }
       }
     }
-    worldCtx.globalAlpha=1;
+    ctx.globalAlpha = 1;
   }
 
-  if(p.stance==='DP'&&p.hid.resilience>15){
-    const wallH=5+p.hid.resilience*0.3;
-    worldCtx.fillStyle='#2a4a2a';worldCtx.fillRect(0,groundY-wallH,W,wallH);
-    for(let i=0;i<W;i+=12) worldCtx.fillRect(i,groundY-wallH-4,6,4);
+  if (p.stance === 'DP' && p.hid.resilience > 10) {
+    // Fortress wall with battlements
+    const wallH = 4 + p.hid.resilience * 0.25;
+    ctx.fillStyle = '#2a4a2a';
+    ctx.fillRect(0, groundY - wallH, W, wallH);
+    // Battlements
+    for (let i = 0; i < W; i += 10) {
+      ctx.fillRect(i, groundY - wallH - 3, 5, 3);
+    }
+    // Wall highlight
+    ctx.fillStyle = '#3a5a3a';
+    ctx.fillRect(0, groundY - wallH, W, 1);
   }
 
-  if(p.stance==='IP'&&p.hid.bureaucracy>20){
-    worldCtx.globalAlpha=Math.min(0.4,p.hid.bureaucracy/200);
-    worldCtx.fillStyle='#4a3a20';worldCtx.fillRect(0,0,W,H);worldCtx.globalAlpha=1;
+  if (p.stance === 'IP' && p.hid.bureaucracy > 15) {
+    // Fog of bureaucracy
+    ctx.globalAlpha = Math.min(0.35, p.hid.bureaucracy / 250);
+    ctx.fillStyle = '#4a3a20';
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
   }
 
-  if(G.worldTension>70&&Math.random()>0.7){
-    worldCtx.strokeStyle='#fff';worldCtx.globalAlpha=0.6;worldCtx.lineWidth=2;
-    worldCtx.beginPath();
-    let lx=Math.random()*W,ly=0;worldCtx.moveTo(lx,ly);
-    for(let s=0;s<5;s++){lx+=(Math.random()-0.5)*30;ly+=15+Math.random()*20;worldCtx.lineTo(lx,ly);}
-    worldCtx.stroke();worldCtx.globalAlpha=1;
+  // Character (simple pixel person)
+  const charX = Math.floor(worldAnim.character.x);
+  const charY = Math.floor(groundY - 8);
+  const charFrame = Math.floor(worldAnim.character.frame);
+  ctx.fillStyle = SC[p.stance];
+  // Head
+  ctx.fillRect(charX + 1, charY, 3, 3);
+  // Body
+  ctx.fillRect(charX + 1, charY + 3, 3, 3);
+  // Legs (animated)
+  if (charFrame < 2) {
+    ctx.fillRect(charX, charY + 6, 2, 2);
+    ctx.fillRect(charX + 3, charY + 6, 2, 2);
+  } else {
+    ctx.fillRect(charX + 1, charY + 6, 1, 2);
+    ctx.fillRect(charX + 3, charY + 6, 1, 2);
   }
 
-  worldCtx.fillStyle='#ffffff';worldCtx.globalAlpha=0.15;
-  worldCtx.font='40px "Press Start 2P"';worldCtx.fillText('Y'+G.year,W-110,H-15);
-  worldCtx.globalAlpha=1;
+  // Year watermark
+  ctx.fillStyle = '#ffffff';
+  ctx.globalAlpha = 0.08;
+  ctx.font = '36px "Press Start 2P"';
+  ctx.fillText('Y' + G.year, W - 100, H - 12);
+  ctx.globalAlpha = 1;
+}
+
+function renderWorld() {
+  const canvas = document.getElementById('world-canvas');
+  if (!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = Math.floor(rect.width);
+  canvas.height = Math.floor(Math.max(80, rect.height - 260));
+  worldCtx = canvas.getContext('2d');
+  worldW = canvas.width;
+  worldH = canvas.height;
+  initWorldBuildings(cp());
+}
+
+// Continuous world animation loop
+let worldAnimRunning = false;
+function worldAnimLoop() {
+  if (!document.getElementById('play-screen').classList.contains('active')) {
+    worldAnimRunning = false;
+    return;
+  }
+  const p = cp();
+  tickWorldAnim(p);
+  drawWorld(p);
+  worldAnimRunning = true;
+  requestAnimationFrame(worldAnimLoop);
+}
+
+function startWorldAnim() {
+  if (!worldAnimRunning) {
+    worldAnimRunning = true;
+    worldAnimLoop();
+  }
+}
+
+// Trigger damage visual on shock events
+function worldShock() {
+  worldAnim.buildings.forEach(b => {
+    b.damage = Math.min(1, b.damage + 0.4 + Math.random() * 0.3);
+  });
+}
+
+// Trigger growth burst on opportunity events
+function worldOpportunity() {
+  worldAnim.buildings.forEach(b => {
+    b.targetH = Math.min(worldH * 0.55, b.targetH + 5 + Math.random() * 10);
+  });
 }
 
 // ── ANIMATION LOOP ────────────────────────────────────────
@@ -2270,7 +2709,10 @@ function animLoop(){tickP();requestAnimationFrame(animLoop);}
 animLoop();
 
 window.addEventListener('resize',()=>{
-  if(document.getElementById('play-screen').classList.contains('active')) renderWorld();
+  if(document.getElementById('play-screen').classList.contains('active')) {
+    renderWorld();
+    startWorldAnim();
+  }
 });
 
 document.addEventListener('keydown',e=>{
