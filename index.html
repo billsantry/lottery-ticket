@@ -1258,27 +1258,40 @@ function sfx(type) {
   } catch(e) {}
 }
 
-
-
-// ── BACKGROUND MUSIC ─────────────────────────────────────────────────────────
-// Maple Leaf Rag — Scott Joplin (1899) — PUBLIC DOMAIN
-// 8-bit chiptune arrangement: melody (square) + stride bass (triangle)
-
+// ── BACKGROUND MUSIC: SLIDING OPTIMISM ────────────────────────
+// Major key with smooth portamento slides - trombone/Silicon Valley style
 const Music = (() => {
   const LS_KEY = "8bit_futures_music";
-  let enabled = (localStorage.getItem(LS_KEY) ?? "on") !== "off";
+  let enabled = (localStorage.getItem(LS_KEY) ?? "on") === "on";
 
   let ctx = null;
   let melGain = null;
   let bassGain = null;
+  let percGain = null;
   let timer = null;
   let noteIdx = 0;
   let nextTime = 0;
-  let tense = false; // tension mode: slower, quieter bass
+  let tense = false;
 
-  const BPM = 132;
-  const BPM_TENSE = 108;
-  const midi = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const BPM = 108; // Bouncy, game-friendly
+  const BPM_TENSE = 88;
+  
+  // Pythagorean tuning - base frequency 220 Hz
+  const BASE = 220;
+  const pythag = (ratio) => BASE * ratio;
+  
+  // Pure mathematical ratios
+  const RATIOS = {
+    root: 1,           // 1:1
+    oct: 2,            // 2:1
+    oct2: 4,           // 4:1
+    fifth: 3/2,        // 3:2 (perfect fifth)
+    fourth: 4/3,       // 4:3 (perfect fourth)
+    maj2: 9/8,         // 9:8 (major second)
+    maj3: 81/64,       // 81:64 (Pythagorean major third)
+    maj6: 27/16,       // 27:16 (major sixth)
+    maj7: 243/128,     // 243:128 (major seventh)
+  };
 
   function ensure() {
     if (typeof ensureAudio === "function") ctx = ensureAudio();
@@ -1286,26 +1299,67 @@ const Music = (() => {
 
     if (!melGain) {
       melGain = ctx.createGain();
-      melGain.gain.value = 0.09;
+      melGain.gain.value = 0.11;
       melGain.connect(ctx.destination);
     }
     if (!bassGain) {
       bassGain = ctx.createGain();
-      bassGain.gain.value = 0.07;
+      bassGain.gain.value = 0.14;
       bassGain.connect(ctx.destination);
+    }
+    if (!percGain) {
+      percGain = ctx.createGain();
+      percGain.gain.value = 0.07;
+      percGain.connect(ctx.destination);
     }
     return ctx;
   }
 
-  function playVoice(note, t, dur, gainNode, waveType, vol) {
-    if (note == null || !ctx) return;
+  // SLIDING NOTE - smooth portamento like a trombone
+  function playSlidingNote(startFreq, endFreq, t, dur, gainNode, waveType, vol, slideRatio = 1.0) {
+    if (startFreq == null || endFreq == null || !ctx) return;
     try {
       const o = ctx.createOscillator();
       const g = ctx.createGain();
       o.type = waveType;
-      o.frequency.setValueAtTime(midi(note), t);
-      const attack = 0.004;
-      const release = dur * 0.8;
+      
+      // Calculate slide duration (portion of note duration spent sliding)
+      const slideDur = dur * slideRatio;
+      
+      // Start at one frequency, slide to another
+      o.frequency.setValueAtTime(startFreq, t);
+      
+      // Use exponentialRamp for smooth, natural-sounding slide
+      if (Math.abs(endFreq - startFreq) > 1) {
+        o.frequency.exponentialRampToValueAtTime(endFreq, t + slideDur);
+      } else {
+        o.frequency.setValueAtTime(endFreq, t);
+      }
+      
+      // Envelope
+      const attack = 0.005;
+      const release = dur * 0.85;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + release);
+      
+      o.connect(g);
+      g.connect(gainNode);
+      o.start(t);
+      o.stop(t + release + 0.05);
+    } catch(e) {}
+  }
+
+  // Regular note (no slide)
+  function playVoice(freq, t, dur, gainNode, waveType, vol) {
+    if (freq == null || !ctx) return;
+    try {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = waveType;
+      o.frequency.setValueAtTime(freq, t);
+      const attack = 0.005;
+      const release = dur * 0.85;
       g.gain.setValueAtTime(0.0001, t);
       g.gain.linearRampToValueAtTime(vol, t + attack);
       g.gain.exponentialRampToValueAtTime(0.0001, t + release);
@@ -1316,127 +1370,170 @@ const Music = (() => {
     } catch(e) {}
   }
 
-  // ── MAPLE LEAF RAG — 8-bit transcription ──
-  // Interleaved events: [beatOffset, 'M'|'B', midiNote, durationInBeats]
-  // M = melody (square wave), B = bass (triangle wave)
-  // Encoded as sections, then assembled into full form
-  // Key of Ab: Ab=56/68/80, Bb=58/70, C=60/72, Db=61/73, Eb=63/75, F=65/77
-
-  function buildSection(melNotes, bassNotes) {
-    const events = [];
-    let t = 0;
-    for (const [note, beats] of melNotes) {
-      if (note != null) events.push([t, 'M', note, beats]);
-      t += beats;
-    }
-    t = 0;
-    for (const [note, beats] of bassNotes) {
-      if (note != null) events.push([t, 'B', note, beats]);
-      t += beats;
-    }
-    const totalBeats = t;
-    return { events, totalBeats };
+  function playDrum(t, type) {
+    if (!ctx) return;
+    try {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      
+      if (type === 'kick') {
+        o.type = 'sine';
+        o.frequency.setValueAtTime(130, t);
+        o.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+        g.gain.setValueAtTime(0.25, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        o.connect(g); g.connect(percGain);
+        o.start(t); o.stop(t + 0.15);
+      } else if (type === 'snare') {
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(180, t);
+        o.frequency.exponentialRampToValueAtTime(95, t + 0.08);
+        g.gain.setValueAtTime(0.15, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.10);
+        o.connect(g); g.connect(percGain);
+        o.start(t); o.stop(t + 0.10);
+      } else if (type === 'hat') {
+        o.type = 'square';
+        o.frequency.setValueAtTime(750, t);
+        g.gain.setValueAtTime(0.08, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        o.connect(g); g.connect(percGain);
+        o.start(t); o.stop(t + 0.04);
+      }
+    } catch(e) {}
   }
 
-  // ── SECTION A — The famous opening theme ──
-  const secA = buildSection(
-    // Melody (right hand) - 16 beats total (8 bars of 2/4)
+  function buildSection(melNotes, bassNotes, drums) {
+    const events = [];
+    let t = 0;
+    
+    // Melody notes can be: [ratio, beats] or [startRatio, endRatio, beats, slideRatio]
+    for (const note of melNotes) {
+      if (note[0] == null) {
+        events.push([t, 'M', null, null, note[1], 0]); // Rest
+        t += note[1];
+      } else if (note.length === 2) {
+        // Regular note: [ratio, beats]
+        events.push([t, 'M', pythag(note[0]), pythag(note[0]), note[1], 0]);
+        t += note[1];
+      } else {
+        // Sliding note: [startRatio, endRatio, beats, slideRatio]
+        events.push([t, 'M', pythag(note[0]), pythag(note[1]), note[2], note[3] || 1.0]);
+        t += note[2];
+      }
+    }
+    
+    t = 0;
+    for (const [ratio, beats] of bassNotes) {
+      if (ratio != null) events.push([t, 'B', pythag(ratio), beats]);
+      t += beats;
+    }
+    
+    t = 0;
+    for (const [type, beats] of drums) {
+      if (type != null) events.push([t, 'D', type, beats]);
+      t += beats;
+    }
+    
+    return { events, totalBeats: t };
+  }
+
+  // ── SLIDING MELODY THEME ──
+  // Smooth slides between notes like Silicon Valley theme
+  
+  const mainTheme = buildSection(
     [
-      // Pickup + bar 1: the iconic chromatic riff
-      [68,0.25],[69,0.25],[70,0.5], [75,0.5],[73,0.25],[72,0.25],
-      // Bar 2
-      [68,0.5],[72,0.5],[73,0.25],[75,0.25],[77,0.5],
-      // Bar 3
-      [75,0.25],[73,0.25],[72,0.5], [68,0.5],[70,0.25],[72,0.25],
-      // Bar 4
-      [68,0.75],[null,0.25],[null,0.5],[68,0.25],[69,0.25],
-      // Bar 5: repeat riff
-      [70,0.5],[75,0.5],[73,0.25],[72,0.25],[68,0.5],
-      // Bar 6
-      [72,0.5],[73,0.25],[75,0.25],[77,0.5],[75,0.5],
-      // Bar 7: turnaround
-      [73,0.25],[72,0.25],[70,0.5], [68,0.25],[70,0.25],[72,0.5],
-      // Bar 8
-      [68,0.75],[null,0.25],[null,0.5],[null,0.5],
+      // Opening phrase with slides
+      [RATIOS.root, RATIOS.maj3, 0.5, 0.8],  // Slide up from root to maj3
+      [RATIOS.maj3, RATIOS.fifth, 0.5, 0.7], // Continue slide to fifth
+      [RATIOS.fifth, 1],                      // Hold fifth
+      [RATIOS.fifth, RATIOS.maj3, 0.5, 0.6], // Slide back down
+      
+      [RATIOS.maj2, RATIOS.fifth, 0.75, 0.8], // Jump slide up
+      [RATIOS.fifth, RATIOS.oct, 0.75, 0.9],  // Slide to octave
+      [RATIOS.oct, 1.5],                       // Hold
+      [null, 0.5],                             // Rest
+      
+      // Second phrase - more slides
+      [RATIOS.root, RATIOS.maj2, 0.5, 0.5],   // Quick slide
+      [RATIOS.maj2, RATIOS.maj3, 0.5, 0.5],   // Continue
+      [RATIOS.maj3, RATIOS.fifth, 0.5, 0.7],  // Slide up
+      [RATIOS.fifth, RATIOS.oct, 0.5, 0.8],   // Big slide
+      
+      [RATIOS.oct, RATIOS.maj6, 0.75, 0.6],   // Slide down
+      [RATIOS.maj6, RATIOS.fifth, 0.5, 0.5],  // Continue down
+      [RATIOS.fifth, RATIOS.root, 1, 0.9],    // Big slide home
+      [RATIOS.root, 1],                        // Land
     ],
-    // Bass (left hand) - stride pattern: root-chord-fifth-chord
     [
-      [44,0.5],[56,0.5],[51,0.5],[56,0.5],  // Ab - Eb/Ab
-      [44,0.5],[56,0.5],[51,0.5],[56,0.5],  // Ab
-      [41,0.5],[56,0.5],[48,0.5],[56,0.5],  // F bass - C bass
-      [44,0.5],[56,0.5],[51,0.5],[58,0.5],  // Ab - Eb
-      [44,0.5],[56,0.5],[51,0.5],[56,0.5],  // Ab
-      [49,0.5],[56,0.5],[44,0.5],[56,0.5],  // Db - Ab
-      [51,0.5],[58,0.5],[51,0.5],[58,0.5],  // Eb7
-      [44,0.5],[56,0.5],[44,0.5],[null,0.5], // Ab
+      // Simple steady bass
+      [RATIOS.root * 0.5, 2], [RATIOS.fifth * 0.5, 2],
+      [RATIOS.root * 0.5, 2], [RATIOS.fourth * 0.5, 2],
+      [RATIOS.fifth * 0.5, 2], [RATIOS.maj3 * 0.5, 2],
+      [RATIOS.root * 0.5, 2], [RATIOS.root * 0.5, 2],
+    ],
+    [
+      // Steady groove
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
     ]
   );
 
-  // ── SECTION B — Second strain, more lyrical ──
-  const secB = buildSection(
+  const variationTheme = buildSection(
     [
-      // Bar 1-2
-      [75,0.5],[77,0.25],[75,0.25],[73,0.5],[72,0.5],
-      [68,0.5],[72,0.5],[73,0.5],[75,0.5],
-      // Bar 3-4
-      [77,0.5],[75,0.25],[73,0.25],[72,0.5],[70,0.5],
-      [68,0.75],[null,0.25],[63,0.25],[65,0.25],[68,0.25],[70,0.25],
-      // Bar 5-6: climax
-      [72,0.5],[73,0.5],[75,0.5],[80,0.5],
-      [77,0.25],[75,0.25],[73,0.5],[72,0.5],[70,0.5],
-      // Bar 7-8: resolve
-      [68,0.5],[70,0.25],[72,0.25],[73,0.5],[72,0.5],
-      [68,0.75],[null,0.25],[null,0.5],[null,0.5],
+      // Variation with different slide patterns
+      [RATIOS.maj3, RATIOS.oct, 1, 0.9],      // Big dramatic slide up
+      [RATIOS.oct, RATIOS.maj7, 0.5, 0.4],    // Quick down
+      [RATIOS.maj7, RATIOS.maj6, 0.5, 0.4],   // Continue
+      [RATIOS.maj6, RATIOS.fifth, 0.5, 0.5],  // Settle
+      [RATIOS.fifth, 1],                       // Hold
+      
+      [RATIOS.fifth, RATIOS.maj3, 0.75, 0.7], // Slide down
+      [RATIOS.maj3, RATIOS.root, 0.75, 0.6],  // Continue down
+      [RATIOS.root, 1.5],                      // Hold
+      [null, 0.5],                             // Rest
+      
+      // Return phrase
+      [RATIOS.root, RATIOS.maj2, 0.5, 0.6],   // Start climbing
+      [RATIOS.maj2, RATIOS.maj3, 0.5, 0.6],   // Continue
+      [RATIOS.maj3, RATIOS.fifth, 0.5, 0.7],  // More
+      [RATIOS.fifth, RATIOS.maj6, 0.5, 0.6],  // Keep going
+      
+      [RATIOS.maj6, RATIOS.oct, 0.75, 0.8],   // Reach octave
+      [RATIOS.oct, RATIOS.fifth, 0.75, 0.6],  // Slide back
+      [RATIOS.fifth, RATIOS.root, 1, 0.8],    // Home
+      [RATIOS.root, 1],                        // Land
     ],
     [
-      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
-      [44,0.5],[60,0.5],[51,0.5],[60,0.5],  // Ab
-      [46,0.5],[58,0.5],[46,0.5],[58,0.5],  // Bb min
-      [51,0.5],[58,0.5],[51,0.5],[58,0.5],  // Eb7
-      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
-      [44,0.5],[60,0.5],[51,0.5],[60,0.5],  // Ab
-      [51,0.5],[58,0.5],[44,0.5],[60,0.5],  // Eb7 - Ab
-      [44,0.5],[56,0.5],[44,0.5],[null,0.5], // Ab
+      [RATIOS.maj3 * 0.5, 2], [RATIOS.oct * 0.5, 2],
+      [RATIOS.fifth * 0.5, 2], [RATIOS.root * 0.5, 2],
+      [RATIOS.root * 0.5, 2], [RATIOS.fifth * 0.5, 2],
+      [RATIOS.maj2 * 0.5, 2], [RATIOS.root * 0.5, 2],
+    ],
+    [
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
+      ['kick', 1], ['hat', 0.5], ['hat', 0.5], ['snare', 1], ['hat', 1],
     ]
   );
 
-  // ── SECTION C — Trio (brighter, in Db area) ──
-  const secC = buildSection(
-    [
-      // Bar 1-2
-      [73,0.5],[75,0.25],[73,0.25],[72,0.5],[68,0.5],
-      [70,0.25],[72,0.25],[73,0.5],[75,0.5],[77,0.5],
-      // Bar 3-4
-      [80,0.5],[77,0.5],[75,0.25],[73,0.25],[72,0.5],
-      [73,0.75],[null,0.25],[null,0.5],[null,0.5],
-      // Bar 5-6: ascending run
-      [61,0.25],[63,0.25],[65,0.25],[68,0.25],[70,0.5],[72,0.5],
-      [73,0.5],[75,0.5],[77,0.5],[75,0.5],
-      // Bar 7-8
-      [73,0.25],[72,0.25],[70,0.5],[68,0.25],[70,0.25],[72,0.5],
-      [68,0.75],[null,0.25],[null,0.5],[null,0.5],
-    ],
-    [
-      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
-      [44,0.5],[60,0.5],[44,0.5],[60,0.5],  // Ab
-      [49,0.5],[61,0.5],[56,0.5],[61,0.5],  // Db
-      [44,0.5],[60,0.5],[51,0.5],[60,0.5],  // Ab
-      [41,0.5],[60,0.5],[48,0.5],[60,0.5],  // F min
-      [46,0.5],[58,0.5],[46,0.5],[58,0.5],  // Bb min
-      [51,0.5],[58,0.5],[44,0.5],[60,0.5],  // Eb7 - Ab
-      [44,0.5],[56,0.5],[44,0.5],[null,0.5], // Ab
-    ]
-  );
+  // Form: Main → Variation → Main → Variation (loops)
+  const FORM = [mainTheme, variationTheme, mainTheme, variationTheme];
 
-  // Ragtime form: AA BB A CC DD A  (loops)
-  const FORM = [secA, secA, secB, secB, secA, secC, secC, secA];
-
-  // Pre-build the full loop as one flat timeline, sorted by beat
   let fullLoop = [];
   let loopBeats = 0;
   for (const sec of FORM) {
-    for (const [beat, type, note, dur] of sec.events) {
-      fullLoop.push([loopBeats + beat, type, note, dur]);
+    for (const evt of sec.events) {
+      if (evt[1] === 'M') {
+        // Melody: [beat, 'M', startFreq, endFreq, dur, slideRatio]
+        fullLoop.push([loopBeats + evt[0], evt[1], evt[2], evt[3], evt[4], evt[5]]);
+      } else {
+        // Bass/Drums: [beat, type, freq/drumtype, dur]
+        fullLoop.push([loopBeats + evt[0], evt[1], evt[2], evt[3]]);
+      }
     }
     loopBeats += sec.totalBeats;
   }
@@ -1444,49 +1541,46 @@ const Music = (() => {
 
   function schedule() {
     if (!enabled || !ctx) return;
-    const spb = 60 / (tense ? BPM_TENSE : BPM); // seconds per beat
+    const spb = 60 / (tense ? BPM_TENSE : BPM);
     const horizon = ctx.currentTime + 0.3;
 
     while (nextTime < horizon) {
-      // Find current position in the loop
-      const loopTime = noteIdx; // noteIdx tracks which event we're on
-      if (loopTime >= fullLoop.length) {
-        // Restart the loop
-        noteIdx = 0;
-      }
-
+      if (noteIdx >= fullLoop.length) noteIdx = 0;
+      
       const evt = fullLoop[noteIdx];
       if (!evt) { noteIdx = 0; continue; }
 
-      const [beat, type, note, dur] = evt;
-
-      // Calculate absolute time for this note
-      // We use nextTime as the base for the current loop start
-      const noteDur = dur * spb;
-
-      if (type === 'M') {
-        playVoice(note, nextTime, noteDur, melGain, 'square', 0.28);
-        // Occasional octave sparkle
-        if (noteIdx % 7 === 0 && note != null) {
-          playVoice(note + 12, nextTime + 0.008, noteDur * 0.5, melGain, 'square', 0.08);
+      if (evt[1] === 'M') {
+        // Melody with potential slide
+        const [beat, type, startFreq, endFreq, dur, slideRatio] = evt;
+        const noteDur = dur * spb;
+        
+        if (startFreq != null && endFreq != null) {
+          // Use sine wave for smoother slides (more trombone-like)
+          playSlidingNote(startFreq, endFreq, nextTime, noteDur, melGain, 'sine', 0.30, slideRatio);
+          
+          // Add subtle harmony (optional - comment out if too busy)
+          if (Math.abs(endFreq - startFreq) < startFreq * 0.3) { // Only on small intervals
+            playSlidingNote(startFreq * RATIOS.maj3, endFreq * RATIOS.maj3, nextTime + 0.005, noteDur * 0.6, melGain, 'sine', 0.12, slideRatio);
+          }
         }
-      } else {
-        playVoice(note, nextTime, noteDur, bassGain, 'triangle', 0.3);
+      } else if (evt[1] === 'B') {
+        // Bass
+        const [beat, type, freq, dur] = evt;
+        const noteDur = dur * spb;
+        playVoice(freq, nextTime, noteDur, bassGain, 'triangle', 0.32);
+      } else if (evt[1] === 'D') {
+        // Drums
+        playDrum(nextTime, evt[2]);
       }
 
-      // Advance to next event
       noteIdx++;
-      // Calculate time gap to next event
       if (noteIdx < fullLoop.length) {
         const nextBeat = fullLoop[noteIdx][0];
-        const thisBeat = beat;
+        const thisBeat = evt[0];
         const gap = (nextBeat - thisBeat) * spb;
-        if (gap > 0) {
-          nextTime += gap;
-        }
-        // If gap is 0, events are simultaneous — keep scheduling in same timeslot
+        if (gap > 0) nextTime += gap;
       } else {
-        // End of loop, small gap then restart
         nextTime += 0.05;
         noteIdx = 0;
       }
@@ -1514,9 +1608,12 @@ const Music = (() => {
         melGain.gain.setTargetAtTime(0.0001, t, 0.03);
         bassGain.gain.cancelScheduledValues(t);
         bassGain.gain.setTargetAtTime(0.0001, t, 0.03);
+        percGain.gain.cancelScheduledValues(t);
+        percGain.gain.setTargetAtTime(0.0001, t, 0.03);
         setTimeout(() => {
-          if (melGain) melGain.gain.value = 0.09;
-          if (bassGain) bassGain.gain.value = 0.07;
+          if (melGain) melGain.gain.value = 0.11;
+          if (bassGain) bassGain.gain.value = 0.14;
+          if (percGain) percGain.gain.value = 0.07;
         }, 150);
       } catch(e) {}
     }
@@ -1562,14 +1659,16 @@ const Music = (() => {
     if (!ctx || !melGain || !bassGain) return;
     try {
       const t = ctx.currentTime;
-      // Tense = quieter melody, muffled bass; normal = full sound
-      melGain.gain.setTargetAtTime(on ? 0.05 : 0.09, t, 0.3);
-      bassGain.gain.setTargetAtTime(on ? 0.04 : 0.07, t, 0.3);
+      melGain.gain.setTargetAtTime(on ? 0.06 : 0.11, t, 0.3);
+      bassGain.gain.setTargetAtTime(on ? 0.08 : 0.14, t, 0.3);
+      percGain.gain.setTargetAtTime(on ? 0.04 : 0.07, t, 0.3);
     } catch(e) {}
   }
 
   return { init, toggle, setEnabled, setTension };
 })();
+	
+// End of music
 
 // Hook up the toggle button (additive; doesn't touch existing UI)
 window.addEventListener("DOMContentLoaded", () => {
